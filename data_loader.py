@@ -3,16 +3,6 @@ data_loader.py
 ==============
 Camada de ingestão de dados brutos (Excel).
 Responsabilidade: carregar, validar e expor os dados sem transformações de negócio.
-
-Aceita como source:
-  - str / Path  → caminho físico no disco
-  - BytesIO     → objeto em memória
-  - UploadedFile do Streamlit → aceito diretamente pelo pandas
-
-REGRAS:
-  - Nunca recalcula margem, lucro ou venda líquida
-  - Nunca modifica os arquivos originais
-  - Toda normalização é feita em memória, sobre cópias
 """
 
 from __future__ import annotations
@@ -23,13 +13,7 @@ from typing import Any, Union
 
 import pandas as pd
 
-# Tipo aceito pelos loaders públicos
 Source = Union[str, Path, io.BytesIO, Any]
-
-
-# ---------------------------------------------------------------------------
-# Mapeamento de colunas: canônico → lista de nomes aceitos (ordem = prioridade)
-# ---------------------------------------------------------------------------
 
 VENDAS_REQUIRED_COLS: dict[str, list[str]] = {
     "sku": [
@@ -59,7 +43,7 @@ VENDAS_REQUIRED_COLS: dict[str, list[str]] = {
         "Lucro Bruto", "lucro_bruto",
     ],
     "margem": [
-        "Margem c/ Reb.",       # nome real confirmado
+        "Margem c/ Reb.",
         "Margem c/ Rebate",
         "Margem com Rebate",
         "Margem c/Rebate",
@@ -69,20 +53,23 @@ VENDAS_REQUIRED_COLS: dict[str, list[str]] = {
         "Margem %",
     ],
     "quantidade": [
-        "Qtd.",                 # nome real confirmado
+        "Qtd.",
         "Quantidade", "quantidade",
         "Qtd", "Qtde", "qtd",
         "Qty",
     ],
+    "data": [
+        "calendarioData",   # nome real confirmado
+        "Data",
+        "Data Emissão",
+        "Data Emissao",
+        "Data Faturamento",
+        "Emissão",
+        "Emissao",
+    ],
 }
 
 VENDAS_OPTIONAL_COLS: dict[str, list[str]] = {
-    "mes": [
-        "Mês", "Mes", "mes", "MES",
-        "Período", "Periodo", "periodo",
-        "Data", "data",
-        "Competência", "Competencia",
-    ],
     "documento": [
         "Documento", "documento",
     ],
@@ -104,13 +91,13 @@ GIRO_REQUIRED_COLS: dict[str, list[str]] = {
         "Desc. Produto",
     ],
     "estoque_atual": [
-        "Estoque Atual",        # nome real confirmado
+        "Estoque Atual",
         "EstoqueAtual", "estoque_atual",
         "Estoque", "estoque",
         "Saldo Estoque",
     ],
     "media_vendas": [
-        "Média Vendas",         # nome real confirmado
+        "Média Vendas",
         "Media Vendas",
         "Média de Vendas",
         "Media de Vendas",
@@ -119,7 +106,7 @@ GIRO_REQUIRED_COLS: dict[str, list[str]] = {
         "Méd. Vendas",
     ],
     "indice_giro": [
-        "Indice Giro",          # nome real confirmado
+        "Indice Giro",
         "Índice Giro",
         "Indice de Giro",
         "Índice de Giro",
@@ -128,13 +115,13 @@ GIRO_REQUIRED_COLS: dict[str, list[str]] = {
         "Giro",
     ],
     "doi": [
-        "Dias Estoque + Pedidos Mês",   # nome real confirmado
+        "Dias Estoque + Pedidos Mês",
         "Dias Estoque + Pedidos Mes",
         "DOI", "doi",
         "Dias de Inventário", "Dias Inventario",
     ],
     "dias_sem_venda": [
-        "Dias Última Venda",    # nome real provável do seu layout
+        "Dias Última Venda",
         "Dias Ultima Venda",
         "Dias sem Venda",
         "Dias Sem Venda",
@@ -143,7 +130,7 @@ GIRO_REQUIRED_COLS: dict[str, list[str]] = {
         "D. Sem Venda",
     ],
     "classificacao_esa": [
-        "ESA Atual",            # nome real confirmado
+        "ESA Atual",
         "ESA",
         "esa",
         "esa_atual",
@@ -190,16 +177,7 @@ _ESA_CANONICAL_MAP = {
 }
 
 
-# ---------------------------------------------------------------------------
-# Helpers internos
-# ---------------------------------------------------------------------------
-
 def _resolve_source(source: Source):
-    """
-    Normaliza o source para uso em pd.read_excel.
-      - str/Path → valida existência em disco e retorna Path
-      - BytesIO / UploadedFile / bytes-like → retorna como está
-    """
     if isinstance(source, (str, Path)):
         path = Path(source)
         if not path.exists():
@@ -209,9 +187,6 @@ def _resolve_source(source: Source):
 
 
 def _normalize_column(df: pd.DataFrame, candidates: list[str], canonical: str) -> pd.DataFrame:
-    """
-    Renomeia a primeira coluna candidata encontrada para o nome canônico.
-    """
     for candidate in candidates:
         if candidate in df.columns:
             if candidate != canonical:
@@ -220,8 +195,8 @@ def _normalize_column(df: pd.DataFrame, candidates: list[str], canonical: str) -
 
     raise KeyError(
         f"\n  Coluna obrigatória '{canonical}' não encontrada.\n"
-        f"  Nomes aceitos (em ordem de prioridade):\n    {candidates}\n"
-        f"  Colunas presentes no arquivo:\n    {sorted(df.columns.tolist())}"
+        f"  Nomes aceitos:\n    {candidates}\n"
+        f"  Colunas presentes:\n    {sorted(df.columns.tolist())}"
     )
 
 
@@ -248,33 +223,16 @@ def _is_blankish(value) -> bool:
     return s == "" or s.lower() in {"nan", "none", "-", "--"}
 
 
-def _count_blankish(series: pd.Series) -> int:
-    return int(series.apply(_is_blankish).sum())
-
-
 def _parse_numeric(series: pd.Series) -> pd.Series:
-    """
-    Converte strings numéricas para float.
-    Suporta:
-      - 1.234,56
-      - 1,234.56
-      - 1234,56
-      - 1234.56
-      - valores vazios / '-' / '--'
-    """
     s = series.astype(str).str.strip()
-
-    # Padroniza valores vazios
-    s = s.replace(
-        {
-            "": None,
-            "-": None,
-            "--": None,
-            "nan": None,
-            "None": None,
-            "none": None,
-        }
-    )
+    s = s.replace({
+        "": None,
+        "-": None,
+        "--": None,
+        "nan": None,
+        "None": None,
+        "none": None,
+    })
 
     def _convert_one(x):
         if x is None or pd.isna(x):
@@ -284,16 +242,12 @@ def _parse_numeric(series: pd.Series) -> pd.Series:
         if x == "":
             return None
 
-        # Se tem vírgula e ponto, detectar padrão
         if "," in x and "." in x:
-            # BR: 1.234,56
             if x.rfind(",") > x.rfind("."):
                 x = x.replace(".", "").replace(",", ".")
-            # EN: 1,234.56
             else:
                 x = x.replace(",", "")
         elif "," in x and "." not in x:
-            # 1234,56
             x = x.replace(",", ".")
 
         try:
@@ -306,51 +260,33 @@ def _parse_numeric(series: pd.Series) -> pd.Series:
 
 
 def _parse_pct(series: pd.Series) -> pd.Series:
-    """
-    Converte percentual textual para número percentual.
-    Ex.: '15,3%' -> 15.3
-    """
     s = series.astype(str).str.strip().str.replace("%", "", regex=False).str.strip()
     return _parse_numeric(s)
 
 
 def _normalize_esa_value(value: str) -> str:
-    """
-    Canonicaliza ESA sem corromper '>=120d'.
-    """
     if value is None or pd.isna(value):
         return ""
-
     raw = str(value).strip()
     if raw == "":
         return ""
+    return _ESA_CANONICAL_MAP.get(raw.lower(), raw)
 
-    key = raw.lower()
-    return _ESA_CANONICAL_MAP.get(key, raw)
-
-
-# ---------------------------------------------------------------------------
-# Loaders públicos
-# ---------------------------------------------------------------------------
 
 def load_vendas(source: Source) -> pd.DataFrame:
-    """
-    Carrega e normaliza o relatório de vendas bruto.
-    """
     source = _resolve_source(source)
 
-    df = pd.read_excel(source, dtype=str)
-    df = df.copy()
+    df = pd.read_excel(source, dtype=str).copy()
     df.columns = df.columns.astype(str).str.strip()
 
     df = _normalize_columns(df, VENDAS_REQUIRED_COLS)
     df = _try_normalize_optional(df, VENDAS_OPTIONAL_COLS)
 
-    # Preserva contagem de vazios antes da conversão, se quiser auditar depois
     df["_blank_venda_liquida"] = df["venda_liquida"].apply(_is_blankish)
     df["_blank_lucro"] = df["lucro"].apply(_is_blankish)
     df["_blank_margem"] = df["margem"].apply(_is_blankish)
     df["_blank_quantidade"] = df["quantidade"].apply(_is_blankish)
+    df["_blank_data"] = df["data"].apply(_is_blankish)
 
     df["venda_liquida"] = _parse_numeric(df["venda_liquida"])
     df["lucro"] = _parse_numeric(df["lucro"])
@@ -362,8 +298,10 @@ def load_vendas(source: Source) -> pd.DataFrame:
     df["fabricante"] = df["fabricante"].astype(str).str.strip()
     df["descricao"] = df["descricao"].astype(str).str.strip()
 
-    if "mes" in df.columns:
-        df["mes"] = df["mes"].astype(str).str.strip()
+    df["data"] = pd.to_datetime(df["data"], errors="coerce")
+    df["ano"] = df["data"].dt.year
+    df["mes"] = df["data"].dt.month
+    df["ano_mes"] = df["data"].dt.to_period("M").astype(str)
 
     if "documento" in df.columns:
         df["documento"] = df["documento"].astype(str).str.strip()
@@ -372,13 +310,9 @@ def load_vendas(source: Source) -> pd.DataFrame:
 
 
 def load_giro(source: Source) -> pd.DataFrame:
-    """
-    Carrega e normaliza o relatório de giro/estoque bruto.
-    """
     source = _resolve_source(source)
 
-    df = pd.read_excel(source, dtype=str)
-    df = df.copy()
+    df = pd.read_excel(source, dtype=str).copy()
     df.columns = df.columns.astype(str).str.strip()
 
     df = _normalize_columns(df, GIRO_REQUIRED_COLS)
@@ -399,20 +333,12 @@ def load_giro(source: Source) -> pd.DataFrame:
     df["sku"] = df["sku"].astype(str).str.strip()
     df["fabricante"] = df["fabricante"].astype(str).str.strip()
     df["descricao"] = df["descricao"].astype(str).str.strip()
-
-    df["classificacao_esa"] = (
-        df["classificacao_esa"]
-        .astype(str)
-        .str.strip()
-        .apply(_normalize_esa_value)
-    )
+    df["classificacao_esa"] = df["classificacao_esa"].astype(str).str.strip().apply(_normalize_esa_value)
 
     if "clientes" in df.columns:
         df["clientes"] = _parse_numeric(df["clientes"])
-
     if "linha" in df.columns:
         df["linha"] = df["linha"].astype(str).str.strip()
-
     if "grupo" in df.columns:
         df["grupo"] = df["grupo"].astype(str).str.strip()
 
@@ -420,51 +346,34 @@ def load_giro(source: Source) -> pd.DataFrame:
 
 
 def load_vendas_multi_mes(sources: dict[str, Source]) -> dict[str, pd.DataFrame]:
-    """
-    Carrega múltiplos arquivos de vendas indexados por rótulo.
-    """
     return {label: load_vendas(src) for label, src in sources.items()}
 
-
-# ---------------------------------------------------------------------------
-# Validações — retornam avisos, nunca levantam exceções
-# ---------------------------------------------------------------------------
 
 def validate_vendas(df: pd.DataFrame) -> list[str]:
     warns: list[str] = []
 
     tipos_validos = {"N", "D"}
-    tipos_encontrados = set(df["tipo"].dropna().unique())
-    tipos_invalidos = tipos_encontrados - tipos_validos
+    tipos_invalidos = set(df["tipo"].dropna().unique()) - tipos_validos
     if tipos_invalidos:
         warns.append(
             f"Valores inesperados na coluna 'Tipo': {sorted(tipos_invalidos)}. "
-            f"Somente 'N' (venda) e 'D' (devolução) são processados."
+            f"Somente 'N' e 'D' são processados."
         )
 
-    n_blank_venda = int(df.get("_blank_venda_liquida", pd.Series(dtype=bool)).sum())
-    if n_blank_venda > 0:
-        warns.append(
-            f"{n_blank_venda} linha(s) com 'Venda Líquida' vazia/invalidada — tratadas como 0."
-        )
+    for col_flag, label in [
+        ("_blank_venda_liquida", "Venda Líquida"),
+        ("_blank_lucro", "Lucro"),
+        ("_blank_margem", "Margem"),
+        ("_blank_quantidade", "Quantidade"),
+        ("_blank_data", "Data"),
+    ]:
+        n = int(df.get(col_flag, pd.Series(dtype=bool)).sum())
+        if n > 0:
+            warns.append(f"{n} linha(s) com '{label}' vazia/inválida.")
 
-    n_blank_lucro = int(df.get("_blank_lucro", pd.Series(dtype=bool)).sum())
-    if n_blank_lucro > 0:
-        warns.append(
-            f"{n_blank_lucro} linha(s) com 'Lucro' vazio/inválido — tratadas como 0."
-        )
-
-    n_blank_margem = int(df.get("_blank_margem", pd.Series(dtype=bool)).sum())
-    if n_blank_margem > 0:
-        warns.append(
-            f"{n_blank_margem} linha(s) com 'Margem' vazia/inválida — tratadas como 0."
-        )
-
-    n_blank_qtd = int(df.get("_blank_quantidade", pd.Series(dtype=bool)).sum())
-    if n_blank_qtd > 0:
-        warns.append(
-            f"{n_blank_qtd} linha(s) com 'Quantidade' vazia/inválida — tratadas como 0."
-        )
+    n_data_invalida = int(df["data"].isna().sum())
+    if n_data_invalida > 0:
+        warns.append(f"{n_data_invalida} linha(s) com data inválida após parsing.")
 
     n_sku_vazio = int(df["sku"].astype(str).str.strip().eq("").sum())
     if n_sku_vazio > 0:
@@ -476,54 +385,28 @@ def validate_vendas(df: pd.DataFrame) -> list[str]:
 def validate_giro(df: pd.DataFrame) -> list[str]:
     warns: list[str] = []
 
-    n_blank_estoque = int(df.get("_blank_estoque_atual", pd.Series(dtype=bool)).sum())
-    if n_blank_estoque > 0:
-        warns.append(
-            f"{n_blank_estoque} linha(s) com 'Estoque Atual' vazio/inválido — tratadas como 0."
-        )
-
-    n_blank_media = int(df.get("_blank_media_vendas", pd.Series(dtype=bool)).sum())
-    if n_blank_media > 0:
-        warns.append(
-            f"{n_blank_media} linha(s) com 'Média Vendas' vazia/inválida — tratadas como 0."
-        )
-
-    n_blank_indice = int(df.get("_blank_indice_giro", pd.Series(dtype=bool)).sum())
-    if n_blank_indice > 0:
-        warns.append(
-            f"{n_blank_indice} linha(s) com 'Indice Giro' vazio/inválido — tratadas como 0."
-        )
-
-    n_blank_doi = int(df.get("_blank_doi", pd.Series(dtype=bool)).sum())
-    if n_blank_doi > 0:
-        warns.append(
-            f"{n_blank_doi} linha(s) com 'DOI' vazio/inválido — tratadas como 0."
-        )
-
-    n_blank_dias = int(df.get("_blank_dias_sem_venda", pd.Series(dtype=bool)).sum())
-    if n_blank_dias > 0:
-        warns.append(
-            f"{n_blank_dias} linha(s) com 'Dias sem Venda' vazio/inválido — tratadas como 0."
-        )
+    for col_flag, label in [
+        ("_blank_estoque_atual", "Estoque Atual"),
+        ("_blank_media_vendas", "Média Vendas"),
+        ("_blank_indice_giro", "Indice Giro"),
+        ("_blank_doi", "DOI"),
+        ("_blank_dias_sem_venda", "Dias sem Venda"),
+    ]:
+        n = int(df.get(col_flag, pd.Series(dtype=bool)).sum())
+        if n > 0:
+            warns.append(f"{n} linha(s) com '{label}' vazio/inválido.")
 
     n_esa_vazia = int(df["classificacao_esa"].astype(str).str.strip().eq("").sum())
     if n_esa_vazia > 0:
         warns.append(f"{n_esa_vazia} linha(s) com ESA vazia.")
 
     esas_encontradas = set(
-        df["classificacao_esa"]
-        .dropna()
-        .astype(str)
-        .str.strip()
-        .replace("", pd.NA)
-        .dropna()
-        .unique()
+        df["classificacao_esa"].dropna().astype(str).str.strip().replace("", pd.NA).dropna().unique()
     )
     esas_inesperadas = esas_encontradas - ESA_VALIDAS
     if esas_inesperadas:
         warns.append(
-            f"Classificações ESA fora da política atual "
-            f"(não causam erro, mas não são penalizadas): {sorted(esas_inesperadas)}."
+            f"Classificações ESA fora da política atual: {sorted(esas_inesperadas)}."
         )
 
     n_sku_vazio = int(df["sku"].astype(str).str.strip().eq("").sum())
