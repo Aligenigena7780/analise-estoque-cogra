@@ -116,7 +116,7 @@ def carregar_vendas(arquivo_bytes: bytes) -> pd.DataFrame:
     df.columns = df.columns.astype(str).str.strip()
 
     col_data = localizar_coluna(df, ["calendarioData", "Data", "Data Emissão", "Data Emissao"])
-    col_bruto = localizar_coluna(df, ["Vendas", "Venda Bruta", "Faturamento Bruto"])
+    col_bruto = localizar_coluna(df, ["Venda", "Vendas", "Venda Bruta", "Faturamento Bruto"])
     col_liquido = localizar_coluna(df, ["Venda Líquida", "Venda Liquida"])
     col_lucro = localizar_coluna(df, ["Lucro"])
     col_tipo = localizar_coluna(df, ["Tipo"])
