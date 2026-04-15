@@ -121,6 +121,7 @@ GIRO_REQUIRED_COLS: dict[str, list[str]] = {
         "Dias de Inventário", "Dias Inventario",
     ],
     "dias_sem_venda": [
+        "Dias Ul. Venda",      # nome real do seu arquivo
         "Dias Última Venda",
         "Dias Ultima Venda",
         "Dias sem Venda",
