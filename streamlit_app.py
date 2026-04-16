@@ -144,11 +144,11 @@ def carregar_vendas(arquivo_bytes: bytes) -> pd.DataFrame:
     df["lucro"] = parse_numeric(df["lucro"]).fillna(0)
     df["tipo"] = df["tipo"].astype(str).str.strip().str.upper()
 
-    # No seu relatório, devoluções já vêm com sinal negativo.
-    # Então os valores ajustados devem respeitar o valor original.
-    df["vendas_aj"] = df["vendas"]
-    df["venda_liquida_aj"] = df["venda_liquida"]
-    df["lucro_aj"] = df["lucro"]
+    # aplica devolução como negativa
+    sinal = df["tipo"].map({"N": 1, "D": -1}).fillna(0)
+    df["vendas_aj"] = df["vendas"] * sinal
+    df["venda_liquida_aj"] = df["venda_liquida"] * sinal
+    df["lucro_aj"] = df["lucro"] * sinal
 
     return df
 
