@@ -144,11 +144,11 @@ def carregar_vendas(arquivo_bytes: bytes) -> pd.DataFrame:
     df["lucro"] = parse_numeric(df["lucro"]).fillna(0)
     df["tipo"] = df["tipo"].astype(str).str.strip().str.upper()
 
-    # aplica devolução como negativa
-    sinal = df["tipo"].map({"N": 1, "D": -1}).fillna(0)
-    df["vendas_aj"] = df["vendas"] * sinal
-    df["venda_liquida_aj"] = df["venda_liquida"] * sinal
-    df["lucro_aj"] = df["lucro"] * sinal
+    # No seu relatório, devoluções já vêm com sinal negativo.
+    # Então os valores ajustados devem respeitar o valor original.
+    df["vendas_aj"] = df["vendas"]
+    df["venda_liquida_aj"] = df["venda_liquida"]
+    df["lucro_aj"] = df["lucro"]
 
     return df
 
@@ -159,8 +159,15 @@ def carregar_giro(arquivo_bytes: bytes) -> pd.DataFrame:
     df.columns = df.columns.astype(str).str.strip()
 
     col_estoque = localizar_coluna(df, ["Estoque Atual"])
-    df = df.rename(columns={col_estoque: "estoque_atual"})
+    col_custo = localizar_coluna(df, ["Custo"])
+
+    df = df.rename(columns={
+        col_estoque: "estoque_atual",
+        col_custo: "custo"
+    })
+
     df["estoque_atual"] = parse_numeric(df["estoque_atual"]).fillna(0)
+    df["custo"] = parse_numeric(df["custo"]).fillna(0)
 
     return df
 
@@ -185,12 +192,12 @@ def obter_mes_anterior(ano: int, mes: int) -> tuple[int, int]:
     return ano, mes - 1
 
 
-def calcular_kpis_cogra(df_vendas_mes: pd.DataFrame, estoque_total: float) -> dict:
+def calcular_kpis_cogra(df_vendas_mes: pd.DataFrame, custo_total: float) -> dict:
     bruto = df_vendas_mes["vendas_aj"].sum()
     liquido = df_vendas_mes["venda_liquida_aj"].sum()
     lucro = df_vendas_mes["lucro_aj"].sum()
     margem = (lucro / liquido) if liquido != 0 else 0
-    gmroii = (lucro / estoque_total) if estoque_total != 0 else 0
+    gmroii = (lucro / custo_total) if custo_total != 0 else 0
 
     return {
         "faturamento_bruto": bruto,
@@ -198,9 +205,9 @@ def calcular_kpis_cogra(df_vendas_mes: pd.DataFrame, estoque_total: float) -> di
         "lucro": lucro,
         "margem": margem,
         "gmroii": gmroii,
-        "estoque_total": estoque_total,
+        "estoque_total": custo_total,
     }
-
+    
 
 def calcular_variacao(atual: float, anterior: float) -> float:
     if anterior == 0:
@@ -271,10 +278,10 @@ ano_anterior, mes_anterior = obter_mes_anterior(ano_atual, mes_atual)
 df_mes_atual = filtrar_mes(df_vendas, ano_atual, mes_atual)
 df_mes_anterior = filtrar_mes(df_vendas, ano_anterior, mes_anterior)
 
-estoque_total = df_giro["estoque_atual"].sum()
+custo_total = df_giro["custo"].sum()
 
-kpis_atual = calcular_kpis_cogra(df_mes_atual, estoque_total)
-kpis_anterior = calcular_kpis_cogra(df_mes_anterior, estoque_total)
+kpis_atual = calcular_kpis_cogra(df_mes_atual, custo_total)
+kpis_anterior = calcular_kpis_cogra(df_mes_anterior, custo_total)
 
 variacoes = {
     "faturamento_bruto": calcular_variacao(kpis_atual["faturamento_bruto"], kpis_anterior["faturamento_bruto"]),
