@@ -71,6 +71,12 @@ def fmt_pp(valor: float) -> str:
     sinal = "+" if valor > 0 else ""
     return f"{sinal}{valor * 100:.2f} p.p.".replace(".", ",")
 
+def fmt_delta_indice(valor: float) -> str:
+    if pd.isna(valor):
+        return "—"
+    sinal = "+" if valor > 0 else ""
+    return f"{sinal}{valor:.2f}".replace(".", ",")
+
 def fmt_brl_int(valor: float) -> str:
     if pd.isna(valor):
         return "R$ 0"
@@ -389,7 +395,11 @@ c4.metric(
     fmt_pct(kpis_atual["margem"]),
     fmt_pp(kpis_atual["margem"] - kpis_anterior["margem"])
 )
-c5.metric("GMROII", fmt_num(kpis_atual["gmroii"]), fmt_var(variacoes["gmroii"]))
+c5.metric(
+    "GMROII",
+    fmt_num(kpis_atual["gmroii"]),
+    fmt_delta_indice(kpis_atual["gmroii"] - kpis_anterior["gmroii"])
+)
 c6.metric("Estoque Total", fmt_brl_int(kpis_atual["estoque_total"]))
 
 st.markdown("### Performance de vendas dentro do mês")
@@ -456,7 +466,7 @@ else:
             col5.metric(
                 "GMROII",
                 fmt_num(kpi_fab_atual["gmroii"]),
-                fmt_var(calcular_variacao(kpi_fab_atual["gmroii"], kpi_fab_anterior["gmroii"]))
+                fmt_delta_indice(kpi_fab_atual["gmroii"] - kpi_fab_anterior["gmroii"])
             )
             col6.metric(
                 "Estoque Total",
