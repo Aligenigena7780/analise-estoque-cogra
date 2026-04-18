@@ -413,10 +413,9 @@ else:
 
         expander_label = (
             f"{fabricante} | "
-            f"Líq.: {fmt_brl_int_label(kpi_fab_atual['faturamento_liquido'])} | "
+            f"Bruto: {fmt_brl_int_label(kpi_fab_atual['faturamento_bruto'])} | "
             f"Lucro: {fmt_brl_int_label(kpi_fab_atual['lucro'])} | "
             f"Margem: {fmt_pct(kpi_fab_atual['margem'])} | "
-            f"Var.: {fmt_var(var_fab)} | "
             f"GMROII: {fmt_num(kpi_fab_atual['gmroii'])}"
         )
 
