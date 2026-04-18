@@ -464,13 +464,13 @@ else:
 
     # resto do código do fabricante
 
-var_fab = (
-    calcular_variacao(
-        kpi_fab_atual["faturamento_liquido"],
-        kpi_fab_anterior["faturamento_liquido"]
-    )
-    if kpi_fab_anterior is not None else np.nan
-)
+        var_fab = (
+            calcular_variacao(
+                kpi_fab_atual["faturamento_liquido"],
+                kpi_fab_anterior["faturamento_liquido"]
+            )
+            if kpi_fab_anterior is not None else np.nan
+        )
 
         expander_label = (
             f"{fabricante} | "
