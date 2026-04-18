@@ -65,6 +65,10 @@ def fmt_brl(valor: float) -> str:
         return "R$ 0"
     return f"R$ {valor:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
 
+def fmt_brl_int(valor: float) -> str:
+    if pd.isna(valor):
+        return "R$ 0"
+    return f"R$ {valor:,.0f}".replace(",", "X").replace(".", ",").replace("X", ".")
 
 def fmt_brl_int_label(valor: float) -> str:
     if pd.isna(valor):
@@ -409,8 +413,8 @@ else:
 
         expander_label = (
             f"{fabricante} | "
-            f"Líq.: {fmt_brl_label(kpi_fab_atual['faturamento_liquido'])} | "
-            f"Lucro: {fmt_brl_label(kpi_fab_atual['lucro'])} | "
+            f"Líq.: {fmt_brl_int_label(kpi_fab_atual['faturamento_liquido'])} | "
+            f"Lucro: {fmt_brl_int_label(kpi_fab_atual['lucro'])} | "
             f"Margem: {fmt_pct(kpi_fab_atual['margem'])} | "
             f"Var.: {fmt_var(var_fab)} | "
             f"GMROII: {fmt_num(kpi_fab_atual['gmroii'])}"
