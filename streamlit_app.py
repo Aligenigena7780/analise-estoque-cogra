@@ -347,6 +347,11 @@ with st.sidebar:
     st.header("Arquivos")
     vendas_file = st.file_uploader("Relatório de Vendas", type=["xlsx", "xls"], key="vendas")
     giro_file = st.file_uploader("Relatório de Giro Atual", type=["xlsx", "xls"], key="giro")
+    giro_anterior_file = st.file_uploader(
+        "Relatório de Giro Anterior (opcional)",
+        type=["xlsx", "xls"],
+        key="giro_anterior"
+    )
 
 if not vendas_file or not giro_file:
     st.info("Faça o upload do relatório de vendas e do relatório de giro atual para continuar.")
@@ -355,6 +360,7 @@ if not vendas_file or not giro_file:
 try:
     df_vendas = carregar_vendas(vendas_file.read())
     df_giro = carregar_giro(giro_file.read())
+    df_giro_anterior = carregar_giro(giro_anterior_file.read()) if giro_anterior_file else None
 except Exception as e:
     st.error(f"Erro ao carregar os arquivos: {e}")
     st.stop()
@@ -366,16 +372,32 @@ df_mes_atual = filtrar_mes(df_vendas, ano_atual, mes_atual)
 df_mes_anterior = filtrar_mes(df_vendas, ano_anterior, mes_anterior)
 
 estoque_total_cogra = df_giro["estoque_total"].sum()
+estoque_total_cogra_anterior = df_giro_anterior["estoque_total"].sum() if df_giro_anterior is not None else None
 
 kpis_atual = calcular_kpis(df_mes_atual, estoque_total_cogra)
-kpis_anterior = calcular_kpis(df_mes_anterior, estoque_total_cogra)
+kpis_anterior = calcular_kpis(df_mes_anterior, estoque_total_cogra_anterior) if estoque_total_cogra_anterior is not None else None
 
 variacoes = {
-    "faturamento_bruto": calcular_variacao(kpis_atual["faturamento_bruto"], kpis_anterior["faturamento_bruto"]),
-    "faturamento_liquido": calcular_variacao(kpis_atual["faturamento_liquido"], kpis_anterior["faturamento_liquido"]),
-    "lucro": calcular_variacao(kpis_atual["lucro"], kpis_anterior["lucro"]),
-    "margem": calcular_variacao(kpis_atual["margem"], kpis_anterior["margem"]),
-    "gmroii": calcular_variacao(kpis_atual["gmroii"], kpis_anterior["gmroii"]),
+    "faturamento_bruto": calcular_variacao(
+        kpis_atual["faturamento_bruto"],
+        kpis_anterior["faturamento_bruto"]
+    ),
+    "faturamento_liquido": calcular_variacao(
+        kpis_atual["faturamento_liquido"],
+        kpis_anterior["faturamento_liquido"]
+    ),
+    "lucro": calcular_variacao(
+        kpis_atual["lucro"],
+        kpis_anterior["lucro"]
+    ),
+    "margem_pp": (
+        kpis_atual["margem"] - kpis_anterior["margem"]
+        if kpis_anterior is not None else np.nan
+    ),
+    "gmroii_delta": (
+        kpis_atual["gmroii"] - kpis_anterior["gmroii"]
+        if kpis_anterior is not None else np.nan
+    ),
 }
 
 # =========================================================
@@ -393,12 +415,13 @@ c3.metric("Lucro", fmt_brl_int(kpis_atual["lucro"]), fmt_var(variacoes["lucro"])
 c4.metric(
     "Margem",
     fmt_pct(kpis_atual["margem"]),
-    fmt_pp(kpis_atual["margem"] - kpis_anterior["margem"])
+    fmt_pp(variacoes["margem_pp"])
 )
+
 c5.metric(
     "GMROII",
     fmt_num(kpis_atual["gmroii"]),
-    fmt_delta_indice(kpis_atual["gmroii"] - kpis_anterior["gmroii"])
+    fmt_delta_indice(variacoes["gmroii_delta"])
 )
 c6.metric("Estoque Total", fmt_brl_int(kpis_atual["estoque_total"]))
 
@@ -423,8 +446,11 @@ if not fabricantes:
     st.warning("Nenhum fabricante encontrado no mês analisado.")
 else:
     for fabricante in fabricantes:
-        kpi_fab_atual = calcular_kpis_fabricante(df_mes_atual, df_giro, fabricante)
-        kpi_fab_anterior = calcular_kpis_fabricante(df_mes_anterior, df_giro, fabricante)
+kpi_fab_atual = calcular_kpis_fabricante(df_mes_atual, df_giro, fabricante)
+kpi_fab_anterior = (
+    calcular_kpis_fabricante(df_mes_anterior, df_giro_anterior, fabricante)
+    if df_giro_anterior is not None else None
+)
 
         var_fab = calcular_variacao(
             kpi_fab_atual["faturamento_liquido"],
@@ -443,35 +469,54 @@ else:
             col1, col2, col3 = st.columns(3)
             col4, col5, col6 = st.columns(3)
 
-            col1.metric(
-                "Faturamento Bruto",
-                fmt_brl_int(kpi_fab_atual["faturamento_bruto"]),
-                fmt_var(calcular_variacao(kpi_fab_atual["faturamento_bruto"], kpi_fab_anterior["faturamento_bruto"]))
-            )
-            col2.metric(
-                "Faturamento Líquido",
-                fmt_brl_int(kpi_fab_atual["faturamento_liquido"]),
-                fmt_var(calcular_variacao(kpi_fab_atual["faturamento_liquido"], kpi_fab_anterior["faturamento_liquido"]))
-            )
-            col3.metric(
-                "Lucro",
-                fmt_brl_int(kpi_fab_atual["lucro"]),
-                fmt_var(calcular_variacao(kpi_fab_atual["lucro"], kpi_fab_anterior["lucro"]))
-            )
-            col4.metric(
-                "Margem",
-                fmt_pct(kpi_fab_atual["margem"]),
-                fmt_pp(kpi_fab_atual["margem"] - kpi_fab_anterior["margem"])
-            )
-            col5.metric(
-                "GMROII",
-                fmt_num(kpi_fab_atual["gmroii"]),
-                fmt_delta_indice(kpi_fab_atual["gmroii"] - kpi_fab_anterior["gmroii"])
-            )
-            col6.metric(
-                "Estoque Total",
-                fmt_brl_int(kpi_fab_atual["estoque_total"])
-            )
+if kpi_fab_anterior is not None:
+    delta_bruto = fmt_var(calcular_variacao(
+        kpi_fab_atual["faturamento_bruto"], kpi_fab_anterior["faturamento_bruto"]
+    ))
+    delta_liq = fmt_var(calcular_variacao(
+        kpi_fab_atual["faturamento_liquido"], kpi_fab_anterior["faturamento_liquido"]
+    ))
+    delta_lucro = fmt_var(calcular_variacao(
+        kpi_fab_atual["lucro"], kpi_fab_anterior["lucro"]
+    ))
+    delta_margem = fmt_pp(kpi_fab_atual["margem"] - kpi_fab_anterior["margem"])
+    delta_gmroii = fmt_delta_indice(kpi_fab_atual["gmroii"] - kpi_fab_anterior["gmroii"])
+else:
+    delta_bruto = "—"
+    delta_liq = "—"
+    delta_lucro = "—"
+    delta_margem = "—"
+    delta_gmroii = "—"
+
+col1.metric(
+    "Faturamento Bruto",
+    fmt_brl_int(kpi_fab_atual["faturamento_bruto"]),
+    delta_bruto
+)
+col2.metric(
+    "Faturamento Líquido",
+    fmt_brl_int(kpi_fab_atual["faturamento_liquido"]),
+    delta_liq
+)
+col3.metric(
+    "Lucro",
+    fmt_brl_int(kpi_fab_atual["lucro"]),
+    delta_lucro
+)
+col4.metric(
+    "Margem",
+    fmt_pct(kpi_fab_atual["margem"]),
+    delta_margem
+)
+col5.metric(
+    "GMROII",
+    fmt_num(kpi_fab_atual["gmroii"]),
+    delta_gmroii
+)
+col6.metric(
+    "Estoque Total",
+    fmt_brl_int(kpi_fab_atual["estoque_total"])
+)
 
             st.markdown("#### Performance diária no mês")
             graf_dia_fab = grafico_diario_fabricante(df_mes_atual, fabricante)
