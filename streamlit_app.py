@@ -378,17 +378,26 @@ kpis_atual = calcular_kpis(df_mes_atual, estoque_total_cogra)
 kpis_anterior = calcular_kpis(df_mes_anterior, estoque_total_cogra_anterior) if estoque_total_cogra_anterior is not None else None
 
 variacoes = {
-    "faturamento_bruto": calcular_variacao(
-        kpis_atual["faturamento_bruto"],
-        kpis_anterior["faturamento_bruto"]
+    "faturamento_bruto": (
+        calcular_variacao(
+            kpis_atual["faturamento_bruto"],
+            kpis_anterior["faturamento_bruto"]
+        )
+        if kpis_anterior is not None else np.nan
     ),
-    "faturamento_liquido": calcular_variacao(
-        kpis_atual["faturamento_liquido"],
-        kpis_anterior["faturamento_liquido"]
+    "faturamento_liquido": (
+        calcular_variacao(
+            kpis_atual["faturamento_liquido"],
+            kpis_anterior["faturamento_liquido"]
+        )
+        if kpis_anterior is not None else np.nan
     ),
-    "lucro": calcular_variacao(
-        kpis_atual["lucro"],
-        kpis_anterior["lucro"]
+    "lucro": (
+        calcular_variacao(
+            kpis_atual["lucro"],
+            kpis_anterior["lucro"]
+        )
+        if kpis_anterior is not None else np.nan
     ),
     "margem_pp": (
         kpis_atual["margem"] - kpis_anterior["margem"]
