@@ -445,13 +445,13 @@ fabricantes = ordem_fabricantes(df_mes_atual)
 if not fabricantes:
     st.warning("Nenhum fabricante encontrado no mês analisado.")
 else:
-for fabricante in fabricantes:
-    kpi_fab_atual = calcular_kpis_fabricante(df_mes_atual, df_giro, fabricante)
+    for fabricante in fabricantes:
+        kpi_fab_atual = calcular_kpis_fabricante(df_mes_atual, df_giro, fabricante)
 
-    kpi_fab_anterior = (
-        calcular_kpis_fabricante(df_mes_anterior, df_giro_anterior, fabricante)
-        if df_giro_anterior is not None else None
-    )
+        kpi_fab_anterior = (
+            calcular_kpis_fabricante(df_mes_anterior, df_giro_anterior, fabricante)
+            if df_giro_anterior is not None else None
+        )
 
     # resto do código do fabricante
 
