@@ -407,14 +407,14 @@ else:
             kpi_fab_anterior["faturamento_liquido"]
         )
 
-expander_label = (
-    f"{fabricante} | "
-    f"Líq.: {fmt_brl_int(kpi_fab_atual['faturamento_liquido'])} | "
-    f"Lucro: {fmt_brl_int(kpi_fab_atual['lucro'])} | "
-    f"Margem: {fmt_pct(kpi_fab_atual['margem'])} | "
-    f"Var.: {fmt_var(var_fab)} | "
-    f"GMROII: {fmt_num(kpi_fab_atual['gmroii'])}"
-)
+        expander_label = (
+            f"{fabricante} | "
+            f"Líq.: {fmt_brl_int(kpi_fab_atual['faturamento_liquido'])} | "
+            f"Lucro: {fmt_brl_int(kpi_fab_atual['lucro'])} | "
+            f"Margem: {fmt_pct(kpi_fab_atual['margem'])} | "
+            f"Var.: {fmt_var(var_fab)} | "
+            f"GMROII: {fmt_num(kpi_fab_atual['gmroii'])}"
+        )
 
         with st.expander(expander_label, expanded=False):
             col1, col2, col3 = st.columns(3)
