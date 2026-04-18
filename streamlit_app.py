@@ -65,6 +65,12 @@ def fmt_brl(valor: float) -> str:
         return "R$ 0"
     return f"R$ {valor:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
 
+def fmt_pp(valor: float) -> str:
+    if pd.isna(valor):
+        return "—"
+    sinal = "+" if valor > 0 else ""
+    return f"{sinal}{valor * 100:.2f} p.p.".replace(".", ",")
+
 def fmt_brl_int(valor: float) -> str:
     if pd.isna(valor):
         return "R$ 0"
@@ -378,7 +384,11 @@ c4, c5, c6 = st.columns(3)
 c1.metric("Faturamento Bruto", fmt_brl_int(kpis_atual["faturamento_bruto"]), fmt_var(variacoes["faturamento_bruto"]))
 c2.metric("Faturamento Líquido", fmt_brl_int(kpis_atual["faturamento_liquido"]), fmt_var(variacoes["faturamento_liquido"]))
 c3.metric("Lucro", fmt_brl_int(kpis_atual["lucro"]), fmt_var(variacoes["lucro"]))
-c4.metric("Margem", fmt_pct(kpis_atual["margem"]), fmt_var(variacoes["margem"]))
+c4.metric(
+    "Margem",
+    fmt_pct(kpis_atual["margem"]),
+    fmt_pp(kpis_atual["margem"] - kpis_anterior["margem"])
+)
 c5.metric("GMROII", fmt_num(kpis_atual["gmroii"]), fmt_var(variacoes["gmroii"]))
 c6.metric("Estoque Total", fmt_brl_int(kpis_atual["estoque_total"]))
 
@@ -441,7 +451,7 @@ else:
             col4.metric(
                 "Margem",
                 fmt_pct(kpi_fab_atual["margem"]),
-                fmt_var(calcular_variacao(kpi_fab_atual["margem"], kpi_fab_anterior["margem"]))
+                fmt_pp(kpi_fab_atual["margem"] - kpi_fab_anterior["margem"])
             )
             col5.metric(
                 "GMROII",
