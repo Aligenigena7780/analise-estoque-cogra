@@ -66,10 +66,11 @@ def fmt_brl(valor: float) -> str:
     return f"R$ {valor:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
 
 
-def fmt_brl_int(valor: float) -> str:
+def fmt_brl_int_label(valor: float) -> str:
     if pd.isna(valor):
-        return "R$ 0"
-    return f"R$ {valor:,.0f}".replace(",", "X").replace(".", ",").replace("X", ".")
+        return r"R\$ 0"
+    texto = f"R$ {valor:,.0f}".replace(",", "X").replace(".", ",").replace("X", ".")
+    return texto.replace("$", r"\$")
 
 
 def fmt_pct(valor: float) -> str:
