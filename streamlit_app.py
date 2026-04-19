@@ -642,7 +642,7 @@ custo_total_atual = df_giro["estoque_total"].sum()
 # KPI 2 — Custo Total Anterior
 # ----------------------------
 if df_giro_anterior is not None:
-    custo_total_anterior = df_giro_anterior["custo"].sum()
+    custo_total_anterior = df_giro_anterior["estoque_total"].sum()
 
     # Variação %
     if custo_total_anterior != 0:
