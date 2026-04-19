@@ -452,15 +452,15 @@ fig.add_trace(go.Scatter(
     marker=dict(size=6)
 ))
     
-    fig.update_layout(
-        title="Performance dos últimos 6 meses",
-        xaxis_title="Mês",
-        yaxis_title="Faturamento",
-        template="plotly_dark",
-        height=400
-    )
+fig.update_layout(
+    title="Performance dos últimos 6 meses",
+    xaxis_title="Mês",
+    yaxis_title="Faturamento",
+    template="plotly_dark",
+    height=400
+)
     
-    st.plotly_chart(fig, use_container_width=True)
+st.plotly_chart(fig, use_container_width=True)
 
 # =========================================================
 # BLOCO 2 — ANÁLISE POR FABRICANTE
