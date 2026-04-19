@@ -598,30 +598,30 @@ else:
                     use_container_width=True,
                     key=f"grafico_dia_fabricante_{fabricante}"
                 )
-
-                st.markdown("#### Performance dos últimos 6 meses")
-                graf_6m_fab = grafico_6m_fabricante(df_vendas, fabricante, ano_atual, mes_atual)
-                
-                fig_fab = go.Figure()
-                
-                fig_fab.add_trace(go.Scatter(
-                    x=graf_6m_fab["label"],
-                    y=graf_6m_fab["faturamento_bruto"],
-                    mode="lines+markers",
-                    line=dict(shape="spline", width=3),
-                    marker=dict(size=6)
-                ))
-                
-                fig_fab.update_layout(
-                    title="Performance dos últimos 6 meses",
-                    xaxis_title="Mês",
-                    yaxis_title="Faturamento",
-                    template="plotly_dark",
-                    height=400
-                )
-                
-                st.plotly_chart(
-                    fig_fab,
-                    use_container_width=True,
-                    key=f"grafico_6m_fabricante_{fabricante}"
-                )
+            
+            st.markdown("#### Performance dos últimos 6 meses")
+            graf_6m_fab = grafico_6m_fabricante(df_vendas, fabricante, ano_atual, mes_atual)
+            
+            fig_fab = go.Figure()
+            
+            fig_fab.add_trace(go.Scatter(
+                x=graf_6m_fab["label"],
+                y=graf_6m_fab["faturamento_bruto"],
+                mode="lines+markers",
+                line=dict(shape="spline", width=3),
+                marker=dict(size=6)
+            ))
+            
+            fig_fab.update_layout(
+                title="Performance dos últimos 6 meses",
+                xaxis_title="Mês",
+                yaxis_title="Faturamento",
+                template="plotly_dark",
+                height=400
+            )
+            
+            st.plotly_chart(
+                fig_fab,
+                use_container_width=True,
+                key=f"grafico_6m_fabricante_{fabricante}"
+            )
