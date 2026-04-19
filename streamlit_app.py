@@ -688,12 +688,16 @@ df_esa = (
 )
 
 # gráfico
+df_esa["hover_brl"] = df_esa["estoque_total"].apply(fmt_brl_int)
+
 fig_esa = go.Figure()
 
 fig_esa.add_trace(go.Bar(
     x=df_esa["estoque_total"],
     y=df_esa["ESA Atual"],
-    orientation='h'
+    orientation="h",
+    customdata=df_esa["hover_brl"],
+    hovertemplate="%{customdata}<extra></extra>"
 ))
 
 fig_esa.update_layout(
