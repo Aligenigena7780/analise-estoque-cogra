@@ -440,12 +440,17 @@ graf_dia = grafico_diario_mes(df_mes_atual)
 
 fig_dia = go.Figure()
 
+graf_dia["hover_brl"] = graf_dia["faturamento_bruto"].apply(fmt_brl_int)
+graf_dia["hover_dia"] = graf_dia["dia"].apply(lambda x: f"Dia {x}")
+
 fig_dia.add_trace(go.Scatter(
     x=graf_dia["dia"],
     y=graf_dia["faturamento_bruto"],
     mode="lines+markers",
-    line=dict(shape="spline", width=3, color='#E20A13'),
-    marker=dict(size=6)
+    line=dict(shape="spline", width=3, color="#E20A13"),
+    marker=dict(size=6),
+    customdata=np.stack([graf_dia["hover_dia"], graf_dia["hover_brl"]], axis=-1),
+    hovertemplate="%{customdata[0]}<br>%{customdata[1]}<extra></extra>"
 ))
 
 fig_dia.update_layout(
@@ -463,12 +468,16 @@ graf_6m = grafico_ultimos_6_meses(df_vendas, ano_atual, mes_atual)
 
 fig = go.Figure()
 
+graf_6m["hover_brl"] = graf_6m["faturamento_bruto"].apply(fmt_brl_int)
+
 fig.add_trace(go.Scatter(
     x=graf_6m["label"],
     y=graf_6m["faturamento_bruto"],
     mode="lines+markers",
-    line=dict(shape="spline", width=3, color='#E20A13'),
-    marker=dict(size=6)
+    line=dict(shape="spline", width=3, color="#E20A13"),
+    marker=dict(size=6),
+    customdata=np.stack([graf_6m["label"], graf_6m["hover_brl"]], axis=-1),
+    hovertemplate="%{customdata[0]}<br>%{customdata[1]}<extra></extra>"
 ))
 
 fig.update_layout(
@@ -577,12 +586,17 @@ else:
             else:
                 fig_dia_fab = go.Figure()
             
+                graf_dia_fab["hover_brl"] = graf_dia_fab["faturamento_bruto"].apply(fmt_brl_int)
+                graf_dia_fab["hover_dia"] = graf_dia_fab["dia"].apply(lambda x: f"Dia {x}")
+                
                 fig_dia_fab.add_trace(go.Scatter(
                     x=graf_dia_fab["dia"],
                     y=graf_dia_fab["faturamento_bruto"],
                     mode="lines+markers",
-                    line=dict(shape="spline", width=3, color='#E20A13'),
-                    marker=dict(size=6)
+                    line=dict(shape="spline", width=3, color="#E20A13"),
+                    marker=dict(size=6),
+                    customdata=np.stack([graf_dia_fab["hover_dia"], graf_dia_fab["hover_brl"]], axis=-1),
+                    hovertemplate="%{customdata[0]}<br>%{customdata[1]}<extra></extra>"
                 ))
             
                 fig_dia_fab.update_layout(
@@ -604,12 +618,16 @@ else:
             
             fig_fab = go.Figure()
             
+            graf_6m_fab["hover_brl"] = graf_6m_fab["faturamento_bruto"].apply(fmt_brl_int)
+            
             fig_fab.add_trace(go.Scatter(
                 x=graf_6m_fab["label"],
                 y=graf_6m_fab["faturamento_bruto"],
                 mode="lines+markers",
-                line=dict(shape="spline", width=3, color='#E20A13'),
-                marker=dict(size=6)
+                line=dict(shape="spline", width=3, color="#E20A13"),
+                marker=dict(size=6),
+                customdata=np.stack([graf_6m_fab["label"], graf_6m_fab["hover_brl"]], axis=-1),
+                hovertemplate="%{customdata[0]}<br>%{customdata[1]}<extra></extra>"
             ))
             
             fig_fab.update_layout(
