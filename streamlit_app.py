@@ -682,7 +682,7 @@ st.markdown("### Distribuição do Estoque por ESA")
 
 df_esa = (
     df_giro
-    .groupby("esa_atual", as_index=False)["estoque_total"]
+    .groupby("ESA Atual", as_index=False)["estoque_total"]
     .sum()
     .sort_values("estoque_total", ascending=True)
 )
@@ -692,7 +692,7 @@ fig_esa = go.Figure()
 
 fig_esa.add_trace(go.Bar(
     x=df_esa["estoque_total"],
-    y=df_esa["esa_atual"],
+    y=df_esa["ESA Atual"],
     orientation='h'
 ))
 
