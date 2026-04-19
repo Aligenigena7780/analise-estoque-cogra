@@ -467,7 +467,7 @@ fig.add_trace(go.Scatter(
     x=graf_6m["label"],
     y=graf_6m["faturamento_bruto"],
     mode="lines+markers",
-    line=dict(shape="spline", width=3),
+    line=dict(shape="spline", width=3, color='#E20A13'),
     marker=dict(size=6)
 ))
 
@@ -581,7 +581,7 @@ else:
                     x=graf_dia_fab["dia"],
                     y=graf_dia_fab["faturamento_bruto"],
                     mode="lines+markers",
-                    line=dict(shape="spline", width=3),
+                    line=dict(shape="spline", width=3, color='#E20A13'),
                     marker=dict(size=6)
                 ))
             
@@ -608,7 +608,7 @@ else:
                 x=graf_6m_fab["label"],
                 y=graf_6m_fab["faturamento_bruto"],
                 mode="lines+markers",
-                line=dict(shape="spline", width=3),
+                line=dict(shape="spline", width=3, color='#E20A13'),
                 marker=dict(size=6)
             ))
             
