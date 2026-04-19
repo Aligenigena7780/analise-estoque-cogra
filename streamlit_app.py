@@ -673,3 +673,35 @@ col3.metric(
     "Variação do Estoque",
     delta_estoque
 )
+
+# ----------------------------
+# PARTE 2 — CUSTO POR ESA
+# ----------------------------
+
+st.markdown("### Distribuição do Estoque por ESA")
+
+df_esa = (
+    df_giro
+    .groupby("esa_atual", as_index=False)["estoque_total"]
+    .sum()
+    .sort_values("estoque_total", ascending=True)
+)
+
+# gráfico
+fig_esa = go.Figure()
+
+fig_esa.add_trace(go.Bar(
+    x=df_esa["estoque_total"],
+    y=df_esa["esa_atual"],
+    orientation='h'
+))
+
+fig_esa.update_layout(
+    title="Custo de Estoque por Classificação ESA",
+    xaxis_title="Custo (R$)",
+    yaxis_title="Classificação ESA",
+    template="plotly_dark",
+    height=400
+)
+
+st.plotly_chart(fig_esa, use_container_width=True, key="grafico_estoque_esa")
