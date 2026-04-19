@@ -437,7 +437,26 @@ c6.metric("Estoque Total", fmt_brl_int(kpis_atual["estoque_total"]))
 
 st.markdown("### Performance de vendas dentro do mês")
 graf_dia = grafico_diario_mes(df_mes_atual)
-st.bar_chart(graf_dia.set_index("dia")["faturamento_bruto"])
+
+fig_dia = go.Figure()
+
+fig_dia.add_trace(go.Scatter(
+    x=graf_dia["dia"],
+    y=graf_dia["faturamento_bruto"],
+    mode="lines+markers",
+    line=dict(shape="spline", width=3),
+    marker=dict(size=6)
+))
+
+fig_dia.update_layout(
+    title="Performance de vendas dentro do mês",
+    xaxis_title="Dia",
+    yaxis_title="Faturamento",
+    template="plotly_dark",
+    height=400
+)
+
+st.plotly_chart(fig_dia, use_container_width=True, key="grafico_dia_cogra")
 
 st.markdown("### Performance de vendas dos últimos 6 meses")
 graf_6m = grafico_ultimos_6_meses(df_vendas, ano_atual, mes_atual)
@@ -552,11 +571,33 @@ else:
 
             st.markdown("#### Performance diária no mês")
             graf_dia_fab = grafico_diario_fabricante(df_mes_atual, fabricante)
-
+            
             if graf_dia_fab.empty:
                 st.info("Sem movimentação no mês para este fabricante.")
             else:
-                st.bar_chart(graf_dia_fab.set_index("dia")["faturamento_bruto"])
+                fig_dia_fab = go.Figure()
+            
+                fig_dia_fab.add_trace(go.Scatter(
+                    x=graf_dia_fab["dia"],
+                    y=graf_dia_fab["faturamento_bruto"],
+                    mode="lines+markers",
+                    line=dict(shape="spline", width=3),
+                    marker=dict(size=6)
+                ))
+            
+                fig_dia_fab.update_layout(
+                    title="Performance diária no mês",
+                    xaxis_title="Dia",
+                    yaxis_title="Faturamento",
+                    template="plotly_dark",
+                    height=400
+                )
+            
+                st.plotly_chart(
+                    fig_dia_fab,
+                    use_container_width=True,
+                    key=f"grafico_dia_fabricante_{fabricante}"
+                )
 
                 st.markdown("#### Performance dos últimos 6 meses")
                 graf_6m_fab = grafico_6m_fabricante(df_vendas, fabricante, ano_atual, mes_atual)
