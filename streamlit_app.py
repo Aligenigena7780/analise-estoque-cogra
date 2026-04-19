@@ -440,7 +440,7 @@ st.bar_chart(graf_dia.set_index("dia")["faturamento_bruto"])
 
 st.markdown("### Performance de vendas dos últimos 6 meses")
 graf_6m = grafico_ultimos_6_meses(df_vendas, ano_atual, mes_atual)
-    import plotly.graph_objects as go
+import plotly.graph_objects as go
     
     fig = go.Figure()
     
