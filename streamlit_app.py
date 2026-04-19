@@ -444,13 +444,13 @@ import plotly.graph_objects as go
     
 fig = go.Figure()
     
-    fig.add_trace(go.Scatter(
-        x=graf_6m["label"],
-        y=graf_6m["faturamento_bruto"],
-        mode='lines+markers',
-        line=dict(shape='spline', width=3),  # 👈 curva suave aqui
-        marker=dict(size=6)
-    ))
+fig.add_trace(go.Scatter(
+    x=graf_6m["label"],
+    y=graf_6m["faturamento_bruto"],
+    mode='lines+markers',
+    line=dict(shape='spline', width=3),  # 👈 curva suave aqui
+    marker=dict(size=6)
+))
     
     fig.update_layout(
         title="Performance dos últimos 6 meses",
