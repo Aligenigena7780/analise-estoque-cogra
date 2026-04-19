@@ -462,8 +462,6 @@ else:
             if df_giro_anterior is not None else None
         )
 
-    # resto do código do fabricante
-
         expander_label = (
             f"{fabricante} | "
             f"Bruto: {fmt_brl_int_label(kpi_fab_atual['faturamento_bruto'])} | "
@@ -476,63 +474,70 @@ else:
             col1, col2, col3 = st.columns(3)
             col4, col5, col6 = st.columns(3)
 
-if kpi_fab_anterior is not None:
-    delta_bruto = fmt_var(calcular_variacao(
-        kpi_fab_atual["faturamento_bruto"], kpi_fab_anterior["faturamento_bruto"]
-    ))
-    delta_liq = fmt_var(calcular_variacao(
-        kpi_fab_atual["faturamento_liquido"], kpi_fab_anterior["faturamento_liquido"]
-    ))
-    delta_lucro = fmt_var(calcular_variacao(
-        kpi_fab_atual["lucro"], kpi_fab_anterior["lucro"]
-    ))
-    delta_margem = fmt_pp(kpi_fab_atual["margem"] - kpi_fab_anterior["margem"])
-    delta_gmroii = fmt_delta_indice(kpi_fab_atual["gmroii"] - kpi_fab_anterior["gmroii"])
-else:
-    delta_bruto = "—"
-    delta_liq = "—"
-    delta_lucro = "—"
-    delta_margem = "—"
-    delta_gmroii = "—"
+            if kpi_fab_anterior is not None:
+                delta_bruto = fmt_var(calcular_variacao(
+                    kpi_fab_atual["faturamento_bruto"],
+                    kpi_fab_anterior["faturamento_bruto"]
+                ))
+                delta_liq = fmt_var(calcular_variacao(
+                    kpi_fab_atual["faturamento_liquido"],
+                    kpi_fab_anterior["faturamento_liquido"]
+                ))
+                delta_lucro = fmt_var(calcular_variacao(
+                    kpi_fab_atual["lucro"],
+                    kpi_fab_anterior["lucro"]
+                ))
+                delta_margem = fmt_pp(
+                    kpi_fab_atual["margem"] - kpi_fab_anterior["margem"]
+                )
+                delta_gmroii = fmt_delta_indice(
+                    kpi_fab_atual["gmroii"] - kpi_fab_anterior["gmroii"]
+                )
+            else:
+                delta_bruto = "—"
+                delta_liq = "—"
+                delta_lucro = "—"
+                delta_margem = "—"
+                delta_gmroii = "—"
 
-col1.metric(
-    "Faturamento Bruto",
-    fmt_brl_int(kpi_fab_atual["faturamento_bruto"]),
-    delta_bruto
-)
-col2.metric(
-    "Faturamento Líquido",
-    fmt_brl_int(kpi_fab_atual["faturamento_liquido"]),
-    delta_liq
-)
-col3.metric(
-    "Lucro",
-    fmt_brl_int(kpi_fab_atual["lucro"]),
-    delta_lucro
-)
-col4.metric(
-    "Margem",
-    fmt_pct(kpi_fab_atual["margem"]),
-    delta_margem
-)
-col5.metric(
-    "GMROII",
-    fmt_num(kpi_fab_atual["gmroii"]),
-    delta_gmroii
-)
-col6.metric(
-    "Estoque Total",
-    fmt_brl_int(kpi_fab_atual["estoque_total"])
-)
+            col1.metric(
+                "Faturamento Bruto",
+                fmt_brl_int(kpi_fab_atual["faturamento_bruto"]),
+                delta_bruto
+            )
+            col2.metric(
+                "Faturamento Líquido",
+                fmt_brl_int(kpi_fab_atual["faturamento_liquido"]),
+                delta_liq
+            )
+            col3.metric(
+                "Lucro",
+                fmt_brl_int(kpi_fab_atual["lucro"]),
+                delta_lucro
+            )
+            col4.metric(
+                "Margem",
+                fmt_pct(kpi_fab_atual["margem"]),
+                delta_margem
+            )
+            col5.metric(
+                "GMROII",
+                fmt_num(kpi_fab_atual["gmroii"]),
+                delta_gmroii
+            )
+            col6.metric(
+                "Estoque Total",
+                fmt_brl_int(kpi_fab_atual["estoque_total"])
+            )
 
-st.markdown("#### Performance diária no mês")
-graf_dia_fab = grafico_diario_fabricante(df_mes_atual, fabricante)
+            st.markdown("#### Performance diária no mês")
+            graf_dia_fab = grafico_diario_fabricante(df_mes_atual, fabricante)
 
-if graf_dia_fab.empty:
-    st.info("Sem movimentação no mês para este fabricante.")
-else:
-    st.bar_chart(graf_dia_fab.set_index("dia")["faturamento_bruto"])
+            if graf_dia_fab.empty:
+                st.info("Sem movimentação no mês para este fabricante.")
+            else:
+                st.bar_chart(graf_dia_fab.set_index("dia")["faturamento_bruto"])
 
-st.markdown("#### Performance dos últimos 6 meses")
-graf_6m_fab = grafico_6m_fabricante(df_vendas, fabricante, ano_atual, mes_atual)
-st.line_chart(graf_6m_fab.set_index("label")["faturamento_bruto"])
+            st.markdown("#### Performance dos últimos 6 meses")
+            graf_6m_fab = grafico_6m_fabricante(df_vendas, fabricante, ano_atual, mes_atual)
+            st.line_chart(graf_6m_fab.set_index("label")["faturamento_bruto"])
