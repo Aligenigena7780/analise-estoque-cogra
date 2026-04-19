@@ -444,7 +444,7 @@ fig_dia.add_trace(go.Scatter(
     x=graf_dia["dia"],
     y=graf_dia["faturamento_bruto"],
     mode="lines+markers",
-    line=dict(shape="spline", width=3),
+    line=dict(shape="spline", width=3, color='#E20A13'),
     marker=dict(size=6)
 ))
 
