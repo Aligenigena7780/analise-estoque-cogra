@@ -4,11 +4,7 @@ import io
 
 import numpy as np
 import pandas as pd
-from __future__ import annotations
-import io
-
-import numpy as np
-import pandas as pd
+import plotly.graph_objects as go
 import streamlit as st
 
 st.set_page_config(
@@ -464,7 +460,7 @@ fig.update_layout(
     height=400
 )
 
-st.plotly_chart(fig, use_container_width=True)
+st.plotly_chart(fig, use_container_width=True, key="grafico_6m_cogra")
 
 # =========================================================
 # BLOCO 2 — ANÁLISE POR FABRICANTE
@@ -562,25 +558,29 @@ else:
             else:
                 st.bar_chart(graf_dia_fab.set_index("dia")["faturamento_bruto"])
 
-            st.markdown("#### Performance dos últimos 6 meses")
-            graf_6m_fab = grafico_6m_fabricante(df_vendas, fabricante, ano_atual, mes_atual)
-            
-            fig_fab = go.Figure()
-            
-            fig_fab.add_trace(go.Scatter(
-                x=graf_6m_fab["label"],
-                y=graf_6m_fab["faturamento_bruto"],
-                mode="lines+markers",
-                line=dict(shape="spline", width=3),
-                marker=dict(size=6)
-            ))
-            
-            fig_fab.update_layout(
-                title="Performance dos últimos 6 meses",
-                xaxis_title="Mês",
-                yaxis_title="Faturamento",
-                template="plotly_dark",
-                height=400
-            )
-            
-            st.plotly_chart(fig_fab, use_container_width=True)
+                st.markdown("#### Performance dos últimos 6 meses")
+                graf_6m_fab = grafico_6m_fabricante(df_vendas, fabricante, ano_atual, mes_atual)
+                
+                fig_fab = go.Figure()
+                
+                fig_fab.add_trace(go.Scatter(
+                    x=graf_6m_fab["label"],
+                    y=graf_6m_fab["faturamento_bruto"],
+                    mode="lines+markers",
+                    line=dict(shape="spline", width=3),
+                    marker=dict(size=6)
+                ))
+                
+                fig_fab.update_layout(
+                    title="Performance dos últimos 6 meses",
+                    xaxis_title="Mês",
+                    yaxis_title="Faturamento",
+                    template="plotly_dark",
+                    height=400
+                )
+                
+                st.plotly_chart(
+                    fig_fab,
+                    use_container_width=True,
+                    key=f"grafico_6m_fabricante_{fabricante}"
+                )
