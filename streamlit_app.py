@@ -445,8 +445,8 @@ graf_6m = grafico_ultimos_6_meses(df_vendas, ano_atual, mes_atual)
     fig = go.Figure()
     
     fig.add_trace(go.Scatter(
-        x=graf_6m_fab["label"],
-        y=graf_6m_fab["faturamento_bruto"],
+        x=graf_6m["label"],
+        y=graf_6m["faturamento_bruto"],
         mode='lines+markers',
         line=dict(shape='spline', width=3),  # 👈 curva suave aqui
         marker=dict(size=6)
@@ -565,8 +565,8 @@ else:
             fig = go.Figure()
             
             fig.add_trace(go.Scatter(
-                x=graf_6m_fab["label"],
-                y=graf_6m_fab["faturamento_bruto"],
+                x=graf_6m["label"],
+                y=graf_6m["faturamento_bruto"],
                 mode='lines+markers',
                 line=dict(shape='spline', width=3),  # 👈 curva suave aqui
                 marker=dict(size=6)
