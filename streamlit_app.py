@@ -442,7 +442,7 @@ st.markdown("### Performance de vendas dos últimos 6 meses")
 graf_6m = grafico_ultimos_6_meses(df_vendas, ano_atual, mes_atual)
 import plotly.graph_objects as go
     
-    fig = go.Figure()
+fig = go.Figure()
     
     fig.add_trace(go.Scatter(
         x=graf_6m["label"],
