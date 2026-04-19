@@ -636,7 +636,7 @@ st.markdown('<div class="section-title">Análise de Estoque</div>', unsafe_allow
 # ----------------------------
 # KPI 1 — Custo Total Atual
 # ----------------------------
-custo_total_atual = df_giro["custo"].sum()
+custo_total_atual = df_giro["estoque_total"].sum()
 
 # ----------------------------
 # KPI 2 — Custo Total Anterior
