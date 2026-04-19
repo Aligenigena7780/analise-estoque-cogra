@@ -625,3 +625,51 @@ else:
                 use_container_width=True,
                 key=f"grafico_6m_fabricante_{fabricante}"
             )
+
+# ============================================================
+# BLOCO 3 — ANÁLISE DE ESTOQUE
+# ============================================================
+
+st.markdown('<div class="section-divider"></div>', unsafe_allow_html=True)
+st.markdown('<div class="section-title">Análise de Estoque</div>', unsafe_allow_html=True)
+
+# ----------------------------
+# KPI 1 — Custo Total Atual
+# ----------------------------
+custo_total_atual = df_giro["custo"].sum()
+
+# ----------------------------
+# KPI 2 — Custo Total Anterior
+# ----------------------------
+if df_giro_anterior is not None:
+    custo_total_anterior = df_giro_anterior["custo"].sum()
+
+    # Variação %
+    if custo_total_anterior != 0:
+        variacao_estoque = (custo_total_atual - custo_total_anterior) / custo_total_anterior
+        delta_estoque = fmt_var(variacao_estoque)
+    else:
+        delta_estoque = "—"
+else:
+    custo_total_anterior = None
+    delta_estoque = "—"
+
+# ----------------------------
+# Exibição dos KPIs
+# ----------------------------
+col1, col2, col3 = st.columns(3)
+
+col1.metric(
+    "Custo Total Atual",
+    fmt_brl_int(custo_total_atual)
+)
+
+col2.metric(
+    "Custo Mês Anterior",
+    fmt_brl_int(custo_total_anterior) if custo_total_anterior is not None else "—"
+)
+
+col3.metric(
+    "Variação do Estoque",
+    delta_estoque
+)
