@@ -440,27 +440,27 @@ st.bar_chart(graf_dia.set_index("dia")["faturamento_bruto"])
 
 st.markdown("### Performance de vendas dos últimos 6 meses")
 graf_6m = grafico_ultimos_6_meses(df_vendas, ano_atual, mes_atual)
-import plotly.graph_objects as go
-
-fig = go.Figure()
-
-fig.add_trace(go.Scatter(
-    x=graf_6m_fab["label"],
-    y=graf_6m_fab["faturamento_bruto"],
-    mode='lines+markers',
-    line=dict(shape='spline', width=3),  # 👈 curva suave aqui
-    marker=dict(size=6)
-))
-
-fig.update_layout(
-    title="Performance dos últimos 6 meses",
-    xaxis_title="Mês",
-    yaxis_title="Faturamento",
-    template="plotly_dark",
-    height=400
-)
-
-st.plotly_chart(fig, use_container_width=True)
+    import plotly.graph_objects as go
+    
+    fig = go.Figure()
+    
+    fig.add_trace(go.Scatter(
+        x=graf_6m_fab["label"],
+        y=graf_6m_fab["faturamento_bruto"],
+        mode='lines+markers',
+        line=dict(shape='spline', width=3),  # 👈 curva suave aqui
+        marker=dict(size=6)
+    ))
+    
+    fig.update_layout(
+        title="Performance dos últimos 6 meses",
+        xaxis_title="Mês",
+        yaxis_title="Faturamento",
+        template="plotly_dark",
+        height=400
+    )
+    
+    st.plotly_chart(fig, use_container_width=True)
 
 # =========================================================
 # BLOCO 2 — ANÁLISE POR FABRICANTE
@@ -562,22 +562,22 @@ else:
             graf_6m_fab = grafico_6m_fabricante(df_vendas, fabricante, ano_atual, mes_atual)
             import plotly.graph_objects as go
 
-fig = go.Figure()
-
-fig.add_trace(go.Scatter(
-    x=graf_6m_fab["label"],
-    y=graf_6m_fab["faturamento_bruto"],
-    mode='lines+markers',
-    line=dict(shape='spline', width=3),  # 👈 curva suave aqui
-    marker=dict(size=6)
-))
-
-fig.update_layout(
-    title="Performance dos últimos 6 meses",
-    xaxis_title="Mês",
-    yaxis_title="Faturamento",
-    template="plotly_dark",
-    height=400
-)
-
-st.plotly_chart(fig, use_container_width=True)
+            fig = go.Figure()
+            
+            fig.add_trace(go.Scatter(
+                x=graf_6m_fab["label"],
+                y=graf_6m_fab["faturamento_bruto"],
+                mode='lines+markers',
+                line=dict(shape='spline', width=3),  # 👈 curva suave aqui
+                marker=dict(size=6)
+            ))
+            
+            fig.update_layout(
+                title="Performance dos últimos 6 meses",
+                xaxis_title="Mês",
+                yaxis_title="Faturamento",
+                template="plotly_dark",
+                height=400
+            )
+            
+            st.plotly_chart(fig, use_container_width=True)
