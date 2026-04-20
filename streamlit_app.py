@@ -194,7 +194,11 @@ def carregar_giro(arquivo_bytes: bytes) -> pd.DataFrame:
 
     col_custo = localizar_coluna(df, ["Custo"])
     col_fabricante = localizar_coluna(df, ["Fabricante"])
-    col_sku = localizar_coluna(df, ["SKU", "Sku", "sku"], obrigatoria=False)
+    col_sku = localizar_coluna(
+    df,
+    ["SKU", "Sku", "sku", "Código", "Codigo", "Cod Produto", "Cod. Produto"],
+    obrigatoria=False
+)
 
     rename_map = {
         col_custo: "estoque_total",
@@ -741,7 +745,21 @@ else:
     df_vendas_esa = df_mes_atual[["sku", "vendas_aj"]].copy()
 
     # base giro anterior (ESA)
-    df_esa_lookup = df_giro_anterior[["sku", "ESA Atual"]].copy()
+    col_sku_giro_ant = "sku" if "sku" in df_giro_anterior.columns else None
+    col_esa_giro_ant = "ESA Atual" if "ESA Atual" in df_giro_anterior.columns else None
+    
+    if col_sku_giro_ant is None or col_esa_giro_ant is None:
+        st.error(
+            f"Não foi possível montar o faturamento por ESA. "
+            f"Colunas encontradas no giro anterior: {list(df_giro_anterior.columns)}"
+        )
+        st.stop()
+    
+    df_esa_lookup = df_giro_anterior[[col_sku_giro_ant, col_esa_giro_ant]].copy()
+    df_esa_lookup = df_esa_lookup.rename(columns={
+        col_sku_giro_ant: "sku",
+        col_esa_giro_ant: "ESA Atual"
+    })
 
     # merge
     df_merge = df_vendas_esa.merge(
