@@ -727,3 +727,61 @@ fig_esa.update_layout(
 )
 
 st.plotly_chart(fig_esa, use_container_width=True, key="grafico_estoque_esa")
+
+# ----------------------------
+# PARTE 3.1 — FATURAMENTO POR ESA (GERAL)
+# ----------------------------
+
+st.markdown("### Faturamento por ESA")
+
+if df_giro_anterior is None:
+    st.warning("Envie o relatório de giro anterior para visualizar o faturamento por ESA.")
+else:
+    # base vendas
+    df_vendas_esa = df_mes_atual[["sku", "vendas_aj"]].copy()
+
+    # base giro anterior (ESA)
+    df_esa_lookup = df_giro_anterior[["sku", "ESA Atual"]].copy()
+
+    # merge
+    df_merge = df_vendas_esa.merge(
+        df_esa_lookup,
+        on="sku",
+        how="left"
+    )
+
+    # tratar não encontrados
+    df_merge["ESA Atual"] = df_merge["ESA Atual"].fillna("Sem classificação")
+
+    # agrupamento
+    df_fat_esa = (
+        df_merge
+        .groupby("ESA Atual", as_index=False)["vendas_aj"]
+        .sum()
+        .rename(columns={"vendas_aj": "faturamento_bruto"})
+        .sort_values("faturamento_bruto", ascending=True)
+    )
+
+    # hover formatado
+    df_fat_esa["hover_brl"] = df_fat_esa["faturamento_bruto"].apply(fmt_brl_int)
+
+    # gráfico
+    fig_fat_esa = go.Figure()
+
+    fig_fat_esa.add_trace(go.Bar(
+        x=df_fat_esa["faturamento_bruto"],
+        y=df_fat_esa["ESA Atual"],
+        orientation="h",
+        customdata=df_fat_esa["hover_brl"],
+        hovertemplate="%{customdata}<extra></extra>"
+    ))
+
+    fig_fat_esa.update_layout(
+        title="Faturamento por Classificação ESA",
+        xaxis_title="Faturamento (R$)",
+        yaxis_title="Classificação ESA",
+        template="plotly_dark",
+        height=400
+    )
+
+    st.plotly_chart(fig_fat_esa, use_container_width=True, key="grafico_faturamento_esa")
