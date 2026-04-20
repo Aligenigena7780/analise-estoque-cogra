@@ -836,7 +836,11 @@ else:
             ].copy()
 
             # lookup ESA do giro anterior
-            df_esa_lookup_fab = df_giro_anterior[["sku", "ESA Atual"]].copy()
+            df_esa_lookup_fab = df_giro_anterior[[col_sku_giro_ant, col_esa_giro_ant]].copy()
+            df_esa_lookup_fab = df_esa_lookup_fab.rename(columns={
+                col_sku_giro_ant: "sku",
+                col_esa_giro_ant: "ESA Atual"
+            })
 
             # merge
             df_merge_fab = df_vendas_fab.merge(
