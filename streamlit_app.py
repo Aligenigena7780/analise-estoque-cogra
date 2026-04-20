@@ -803,3 +803,84 @@ else:
     )
 
     st.plotly_chart(fig_fat_esa, use_container_width=True, key="grafico_faturamento_esa")
+
+# ----------------------------
+# PARTE 3.2 — FATURAMENTO POR ESA POR FABRICANTE
+# ----------------------------
+
+st.markdown("### Faturamento por ESA por Fabricante")
+
+if df_giro_anterior is None:
+    st.warning("Envie o relatório de giro anterior para visualizar o faturamento por ESA por fabricante.")
+else:
+    fabricantes_fat_esa = (
+        df_mes_atual.groupby("fabricante", as_index=False)["vendas_aj"]
+        .sum()
+        .sort_values("vendas_aj", ascending=False)
+    )
+
+    for _, row in fabricantes_fat_esa.iterrows():
+        fabricante = row["fabricante"]
+        faturamento_total_fab = row["vendas_aj"]
+
+        expander_label = (
+            f"{fabricante} | "
+            f"Faturamento Bruto: {fmt_brl_int_label(faturamento_total_fab)}"
+        )
+
+        with st.expander(expander_label, expanded=False):
+            # vendas da fabricante no mês
+            df_vendas_fab = df_mes_atual.loc[
+                df_mes_atual["fabricante"] == fabricante,
+                ["sku", "vendas_aj"]
+            ].copy()
+
+            # lookup ESA do giro anterior
+            df_esa_lookup_fab = df_giro_anterior[["sku", "ESA Atual"]].copy()
+
+            # merge
+            df_merge_fab = df_vendas_fab.merge(
+                df_esa_lookup_fab,
+                on="sku",
+                how="left"
+            )
+
+            # tratar não encontrados
+            df_merge_fab["ESA Atual"] = df_merge_fab["ESA Atual"].fillna("Sem classificação")
+
+            # agrupamento
+            df_fat_esa_fab = (
+                df_merge_fab
+                .groupby("ESA Atual", as_index=False)["vendas_aj"]
+                .sum()
+                .rename(columns={"vendas_aj": "faturamento_bruto"})
+                .sort_values("faturamento_bruto", ascending=True)
+            )
+
+            # hover formatado
+            df_fat_esa_fab["hover_brl"] = df_fat_esa_fab["faturamento_bruto"].apply(fmt_brl_int)
+
+            # gráfico
+            fig_fat_esa_fab = go.Figure()
+
+            fig_fat_esa_fab.add_trace(go.Bar(
+                x=df_fat_esa_fab["faturamento_bruto"],
+                y=df_fat_esa_fab["ESA Atual"],
+                orientation="h",
+                customdata=df_fat_esa_fab["hover_brl"],
+                hovertemplate="%{customdata}<extra></extra>"
+            ))
+
+            fig_fat_esa_fab.update_layout(
+                title=f"Faturamento por ESA — {fabricante}",
+                xaxis_title="Faturamento (R$)",
+                yaxis_title="Classificação ESA",
+                template="plotly_dark",
+                height=400
+            )
+
+            st.plotly_chart(
+                fig_fat_esa_fab,
+                use_container_width=True,
+                key=f"grafico_faturamento_esa_fabricante_{fabricante}"
+            )
