@@ -726,7 +726,6 @@ fig_esa.update_layout(
     title="Custo de Estoque por Classificação ESA",
     xaxis_title="Custo (R$)",
     yaxis_title="Classificação ESA",
-    color= "#E20A13",
     template="plotly_dark",
     height=400
 )
@@ -888,4 +887,39 @@ else:
                 fig_fat_esa_fab,
                 use_container_width=True,
                 key=f"grafico_faturamento_esa_fabricante_{fabricante}"
+            )
+
+            st.markdown("#### Estoque por ESA")
+
+            df_estoque_esa_fab = (
+                df_giro[df_giro["fabricante"] == fabricante]
+                .groupby("ESA Atual", as_index=False)["estoque_total"]
+                .sum()
+                .sort_values("estoque_total", ascending=True)
+            )
+
+            df_estoque_esa_fab["hover_brl"] = df_estoque_esa_fab["estoque_total"].apply(fmt_brl_int)
+
+            fig_estoque_esa_fab = go.Figure()
+
+            fig_estoque_esa_fab.add_trace(go.Bar(
+                x=df_estoque_esa_fab["estoque_total"],
+                y=df_estoque_esa_fab["ESA Atual"],
+                orientation="h",
+                customdata=df_estoque_esa_fab["hover_brl"],
+                hovertemplate="%{customdata}<extra></extra>"
+            ))
+
+            fig_estoque_esa_fab.update_layout(
+                title=f"Estoque por ESA — {fabricante}",
+                xaxis_title="Estoque (R$)",
+                yaxis_title="Classificação ESA",
+                template="plotly_dark",
+                height=400
+            )
+
+            st.plotly_chart(
+                fig_estoque_esa_fab,
+                use_container_width=True,
+                key=f"grafico_estoque_esa_fabricante_{fabricante}"
             )
