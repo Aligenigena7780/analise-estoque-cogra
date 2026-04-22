@@ -726,7 +726,7 @@ fig_esa.update_layout(
     title="Custo de Estoque por Classificação ESA",
     xaxis_title="Custo (R$)",
     yaxis_title="Classificação ESA",
-    color="E20A13",
+    color= "#E20A13",
     template="plotly_dark",
     height=400
 )
