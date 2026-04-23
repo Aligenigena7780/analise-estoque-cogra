@@ -1007,7 +1007,18 @@ else:
     df_estoque_esa_fab["ordem"] = df_estoque_esa_fab["ESA Atual"].map(
         {v: i for i, v in enumerate(ordem_esa)}
     )
-    
+
+    cores_esa = {
+    "Normal": "#4CAF50",
+    "Abaixo": "#8BC34A",
+    "Giro": "#03A9F4",
+    "Novo": "#9E9E9E",
+    "Sem": "#757575",
+    "Aging": "#FFC107",
+    "Slow": "#FF9800",
+    ">=120d": "#F44336",
+    "Encalhe": "#B71C1C",
+}
     df_estoque_esa_fab = df_estoque_esa_fab.sort_values("ordem")
 
     ordem_map = {esa: i for i, esa in enumerate(ordem_esa)}
