@@ -60,7 +60,7 @@ MESES_PT = {
 ORDEM_ESA = [
     "8 - Sem",
     "0 - Novo",
-    4 - "Giro",
+    "4 - Giro",
     "1 - Abaixo",
     "1 - Normal",
     "3 - Aging",
