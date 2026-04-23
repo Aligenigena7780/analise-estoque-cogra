@@ -71,17 +71,17 @@ ORDEM_ESA = [
 ]
 
 CORES_ESA = {
-    "Sem": "#757575",
-    "Novo": "#9E9E9E",
-    "Giro": "#03A9F4",
-    "Abaixo": "#8BC34A",
-    "Normal": "#4CAF50",
-    "Aging": "#FFC107",
-    "Slow": "#FF9800",
-    ">=120d": "#F44336",
-    "Encalhe": "#B71C1C",
-    "-": "#616161",
-    "Sem classificação": "#BDBDBD",
+    "Sem": "#E20A13",
+    "Novo": "#E20A13",
+    "Giro": "#E20A13",
+    "Abaixo": "#E20A13",
+    "Normal": "#E20A13",
+    "Aging": "#E20A13",
+    "Slow": "#E20A13",
+    ">=120d": "#E20A13",
+    "Encalhe": "#E20A13",
+    "-": "#E20A13",
+    "Sem classificação": "#E20A13",
 }
 
 def ordenar_esa(df: pd.DataFrame, coluna_esa: str = "ESA Atual") -> pd.DataFrame:
