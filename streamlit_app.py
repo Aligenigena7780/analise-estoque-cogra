@@ -843,7 +843,7 @@ else:
         xaxis_title="Faturamento (R$)",
         yaxis_title="Classificação ESA",
         template="plotly_dark",
-        height=400
+        height=400,
         yaxis=dict(
             categoryorder="array",
             categoryarray=list(reversed(ORDEM_ESA + ["Sem classificação"]))
@@ -931,7 +931,7 @@ else:
                 xaxis_title="Faturamento (R$)",
                 yaxis_title="Classificação ESA",
                 template="plotly_dark",
-                height=400
+                height=400,
                 yaxis=dict(
                     categoryorder="array",
                     categoryarray=list(reversed(ORDEM_ESA + ["Sem classificação"]))
@@ -973,7 +973,7 @@ else:
                 xaxis_title="Estoque (R$)",
                 yaxis_title="Classificação ESA",
                 template="plotly_dark",
-                height=400
+                height=400,
                 yaxis=dict(
                     categoryorder="array",
                     categoryarray=list(reversed(ORDEM_ESA))
