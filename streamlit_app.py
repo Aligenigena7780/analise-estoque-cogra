@@ -1030,7 +1030,7 @@ else:
 
     df_comp_esa["Variação"] = df_comp_esa.apply(calc_var_esa, axis=1)
 
-    ordem_map = {esa: i for i, esa in enumerate(ordem_esa)}
+    ordem_map = {esa: i for i, esa in enumerate(ORDEM_ESA)}
     df_comp_esa["ordem"] = df_comp_esa["ESA Atual"].map(ordem_map).fillna(999)
     df_comp_esa = df_comp_esa.sort_values("ordem").drop(columns="ordem")
 
