@@ -1003,6 +1003,12 @@ else:
         "Encalhe",
         "-"
     ]
+    
+    df_estoque_esa_fab["ordem"] = df_estoque_esa_fab["ESA Atual"].map(
+        {v: i for i, v in enumerate(ordem_esa)}
+    )
+    
+    df_estoque_esa_fab = df_estoque_esa_fab.sort_values("ordem")
 
     ordem_map = {esa: i for i, esa in enumerate(ordem_esa)}
     df_comp_esa["ordem"] = df_comp_esa["ESA Atual"].map(ordem_map).fillna(999)
