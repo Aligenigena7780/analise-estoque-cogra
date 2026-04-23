@@ -899,15 +899,15 @@ else:
 
             df_estoque_esa_fab = (
                 df_giro[df_giro["fabricante"] == fabricante]
-                 .groupby("ESA Atual", as_index=False)["estoque_total"]
-                 .sum()
+                .groupby("ESA Atual", as_index=False)["estoque_total"]
+                .sum()
             )
 
             df_estoque_esa_fab = df_estoque_esa_fab[df_estoque_esa_fab["estoque_total"] > 0].copy()
             df_estoque_esa_fab = df_estoque_esa_fab.sort_values("estoque_total", ascending=True)
 
             df_estoque_esa_fab["hover_brl"] = df_estoque_esa_fab["estoque_total"].apply(fmt_brl_int)
-
+            
             fig_estoque_esa_fab = go.Figure()
 
             fig_estoque_esa_fab.add_trace(go.Bar(
@@ -969,6 +969,12 @@ else:
         .sum()
         .rename(columns={"estoque_total": "Estoque Anterior"})
     )
+
+        df_comp_esa = df_esa_atual_comp.merge(
+        df_esa_anterior_comp,
+        on="ESA Atual",
+        how="outer"
+    ).fillna(0)
 
     df_comp_esa = df_comp_esa[
         (df_comp_esa["Estoque Atual"] > 0) | (df_comp_esa["Estoque Anterior"] > 0)
