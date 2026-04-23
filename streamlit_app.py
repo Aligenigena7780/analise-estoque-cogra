@@ -706,8 +706,10 @@ df_esa = (
     df_giro
     .groupby("ESA Atual", as_index=False)["estoque_total"]
     .sum()
-    .sort_values("estoque_total", ascending=True)
 )
+
+df_esa = df_esa[df_esa["estoque_total"] > 0].copy()
+df_esa = df_esa.sort_values("estoque_total", ascending=True)
 
 # gráfico
 df_esa["hover_brl"] = df_esa["estoque_total"].apply(fmt_brl_int)
@@ -777,8 +779,10 @@ else:
         .groupby("ESA Atual", as_index=False)["vendas_aj"]
         .sum()
         .rename(columns={"vendas_aj": "faturamento_bruto"})
-        .sort_values("faturamento_bruto", ascending=True)
     )
+
+    df_fat_esa = df_fat_esa[df_fat_esa["faturamento_bruto"] > 0].copy()
+    df_fat_esa = df_fat_esa.sort_values("faturamento_bruto", ascending=True)
 
     # hover formatado
     df_fat_esa["hover_brl"] = df_fat_esa["faturamento_bruto"].apply(fmt_brl_int)
@@ -858,8 +862,10 @@ else:
                 .groupby("ESA Atual", as_index=False)["vendas_aj"]
                 .sum()
                 .rename(columns={"vendas_aj": "faturamento_bruto"})
-                .sort_values("faturamento_bruto", ascending=True)
             )
+
+            df_fat_esa_fab = df_fat_esa_fab[df_fat_esa_fab["faturamento_bruto"] > 0].copy()
+            df_fat_esa_fab = df_fat_esa_fab.sort_values("faturamento_bruto", ascending=True)
 
             # hover formatado
             df_fat_esa_fab["hover_brl"] = df_fat_esa_fab["faturamento_bruto"].apply(fmt_brl_int)
@@ -893,10 +899,12 @@ else:
 
             df_estoque_esa_fab = (
                 df_giro[df_giro["fabricante"] == fabricante]
-                .groupby("ESA Atual", as_index=False)["estoque_total"]
-                .sum()
-                .sort_values("estoque_total", ascending=True)
+                 .groupby("ESA Atual", as_index=False)["estoque_total"]
+                 .sum()
             )
+
+df_estoque_esa_fab = df_estoque_esa_fab[df_estoque_esa_fab["estoque_total"] > 0].copy()
+df_estoque_esa_fab = df_estoque_esa_fab.sort_values("estoque_total", ascending=True)
 
             df_estoque_esa_fab["hover_brl"] = df_estoque_esa_fab["estoque_total"].apply(fmt_brl_int)
 
@@ -962,11 +970,9 @@ else:
         .rename(columns={"estoque_total": "Estoque Anterior"})
     )
 
-    df_comp_esa = df_esa_atual_comp.merge(
-        df_esa_anterior_comp,
-        on="ESA Atual",
-        how="outer"
-    ).fillna(0)
+    df_comp_esa = df_comp_esa[
+        (df_comp_esa["Estoque Atual"] > 0) | (df_comp_esa["Estoque Anterior"] > 0)
+    ].copy()
 
     def calc_var_esa(row):
         anterior = row["Estoque Anterior"]
