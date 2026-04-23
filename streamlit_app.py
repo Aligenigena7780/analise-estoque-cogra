@@ -62,7 +62,7 @@ ORDEM_ESA = [
     "0 - Novo",
     "4 - Giro",
     "1 - Abaixo",
-    "1 - Normal",
+    "2 - Normal",
     "3 - Aging",
     "5 - Slow",
     "6 - >=120d",
