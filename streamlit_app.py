@@ -57,7 +57,42 @@ MESES_PT = {
     12: "Dezembro",
 }
 
+ORDEM_ESA = [
+    "Sem",
+    "Novo",
+    "Giro",
+    "Abaixo",
+    "Normal",
+    "Aging",
+    "Slow",
+    ">=120d",
+    "Encalhe",
+    "-"
+]
 
+CORES_ESA = {
+    "Sem": "#757575",
+    "Novo": "#9E9E9E",
+    "Giro": "#03A9F4",
+    "Abaixo": "#8BC34A",
+    "Normal": "#4CAF50",
+    "Aging": "#FFC107",
+    "Slow": "#FF9800",
+    ">=120d": "#F44336",
+    "Encalhe": "#B71C1C",
+    "-": "#616161",
+    "Sem classificação": "#BDBDBD",
+}
+
+def ordenar_esa(df: pd.DataFrame, coluna_esa: str = "ESA Atual") -> pd.DataFrame:
+    ordem_map = {esa: i for i, esa in enumerate(ORDEM_ESA)}
+    df = df.copy()
+    df["ordem"] = df[coluna_esa].map(ordem_map).fillna(999)
+    return df.sort_values("ordem").drop(columns="ordem")
+
+def cores_por_esa(series_esa: pd.Series) -> list[str]:
+    return [CORES_ESA.get(v, "#BDBDBD") for v in series_esa]
+    
 # =========================================================
 # HELPERS
 # =========================================================
@@ -709,7 +744,7 @@ df_esa = (
 )
 
 df_esa = df_esa[df_esa["estoque_total"] > 0].copy()
-df_esa = df_esa.sort_values("estoque_total", ascending=True)
+df_esa = ordenar_esa(df_esa)
 
 # gráfico
 df_esa["hover_brl"] = df_esa["estoque_total"].apply(fmt_brl_int)
@@ -721,7 +756,8 @@ fig_esa.add_trace(go.Bar(
     y=df_esa["ESA Atual"],
     orientation="h",
     customdata=df_esa["hover_brl"],
-    hovertemplate="%{customdata}<extra></extra>"
+    hovertemplate="%{customdata}<extra></extra>",
+    marker=dict(color=cores_por_esa(df_esa["ESA Atual"]))
 ))
 
 fig_esa.update_layout(
@@ -782,7 +818,7 @@ else:
     )
 
     df_fat_esa = df_fat_esa[df_fat_esa["faturamento_bruto"] > 0].copy()
-    df_fat_esa = df_fat_esa.sort_values("faturamento_bruto", ascending=True)
+    df_fat_esa = ordenar_esa(df_fat_esa)
 
     # hover formatado
     df_fat_esa["hover_brl"] = df_fat_esa["faturamento_bruto"].apply(fmt_brl_int)
@@ -795,7 +831,8 @@ else:
         y=df_fat_esa["ESA Atual"],
         orientation="h",
         customdata=df_fat_esa["hover_brl"],
-        hovertemplate="%{customdata}<extra></extra>"
+        hovertemplate="%{customdata}<extra></extra>",
+        marker=dict(color=cores_por_esa(df_fat_esa["ESA Atual"]))
     ))
 
     fig_fat_esa.update_layout(
@@ -865,7 +902,7 @@ else:
             )
 
             df_fat_esa_fab = df_fat_esa_fab[df_fat_esa_fab["faturamento_bruto"] > 0].copy()
-            df_fat_esa_fab = df_fat_esa_fab.sort_values("faturamento_bruto", ascending=True)
+            df_fat_esa_fab = ordenar_esa(df_fat_esa_fab)
 
             # hover formatado
             df_fat_esa_fab["hover_brl"] = df_fat_esa_fab["faturamento_bruto"].apply(fmt_brl_int)
@@ -878,7 +915,8 @@ else:
                 y=df_fat_esa_fab["ESA Atual"],
                 orientation="h",
                 customdata=df_fat_esa_fab["hover_brl"],
-                hovertemplate="%{customdata}<extra></extra>"
+                hovertemplate="%{customdata}<extra></extra>",
+                marker=dict(color=cores_por_esa(df_fat_esa_fab["ESA Atual"]))
             ))
 
             fig_fat_esa_fab.update_layout(
@@ -904,7 +942,7 @@ else:
             )
 
             df_estoque_esa_fab = df_estoque_esa_fab[df_estoque_esa_fab["estoque_total"] > 0].copy()
-            df_estoque_esa_fab = df_estoque_esa_fab.sort_values("estoque_total", ascending=True)
+            df_estoque_esa_fab = ordenar_esa(df_estoque_esa_fab)
 
             df_estoque_esa_fab["hover_brl"] = df_estoque_esa_fab["estoque_total"].apply(fmt_brl_int)
             
@@ -915,7 +953,8 @@ else:
                 y=df_estoque_esa_fab["ESA Atual"],
                 orientation="h",
                 customdata=df_estoque_esa_fab["hover_brl"],
-                hovertemplate="%{customdata}<extra></extra>"
+                hovertemplate="%{customdata}<extra></extra>",
+                marker=dict(color=cores_por_esa(df_estoque_esa_fab["ESA Atual"]))
             ))
 
             fig_estoque_esa_fab.update_layout(
@@ -990,36 +1029,6 @@ else:
         return (atual - anterior) / anterior
 
     df_comp_esa["Variação"] = df_comp_esa.apply(calc_var_esa, axis=1)
-
-    ordem_esa = [
-        "Sem",
-        "Novo",
-        "Giro",
-        "Abaixo",
-        "Normal",
-        "Aging",
-        "Slow",
-        ">=120d",
-        "Encalhe",
-        "-"
-    ]
-    
-    df_estoque_esa_fab["ordem"] = df_estoque_esa_fab["ESA Atual"].map(
-        {v: i for i, v in enumerate(ordem_esa)}
-    )
-
-    cores_esa = {
-    "Normal": "#4CAF50",
-    "Abaixo": "#8BC34A",
-    "Giro": "#03A9F4",
-    "Novo": "#9E9E9E",
-    "Sem": "#757575",
-    "Aging": "#FFC107",
-    "Slow": "#FF9800",
-    ">=120d": "#F44336",
-    "Encalhe": "#B71C1C",
-}
-    df_estoque_esa_fab = df_estoque_esa_fab.sort_values("ordem")
 
     ordem_map = {esa: i for i, esa in enumerate(ordem_esa)}
     df_comp_esa["ordem"] = df_comp_esa["ESA Atual"].map(ordem_map).fillna(999)
