@@ -970,7 +970,7 @@ else:
         .rename(columns={"estoque_total": "Estoque Anterior"})
     )
 
-        df_comp_esa = df_esa_atual_comp.merge(
+    df_comp_esa = df_esa_atual_comp.merge(
         df_esa_anterior_comp,
         on="ESA Atual",
         how="outer"
