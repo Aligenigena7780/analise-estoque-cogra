@@ -903,8 +903,8 @@ else:
                  .sum()
             )
 
-df_estoque_esa_fab = df_estoque_esa_fab[df_estoque_esa_fab["estoque_total"] > 0].copy()
-df_estoque_esa_fab = df_estoque_esa_fab.sort_values("estoque_total", ascending=True)
+            df_estoque_esa_fab = df_estoque_esa_fab[df_estoque_esa_fab["estoque_total"] > 0].copy()
+            df_estoque_esa_fab = df_estoque_esa_fab.sort_values("estoque_total", ascending=True)
 
             df_estoque_esa_fab["hover_brl"] = df_estoque_esa_fab["estoque_total"].apply(fmt_brl_int)
 
