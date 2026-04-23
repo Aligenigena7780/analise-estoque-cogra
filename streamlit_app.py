@@ -923,3 +923,70 @@ else:
                 use_container_width=True,
                 key=f"grafico_estoque_esa_fabricante_{fabricante}"
             )
+
+# ----------------------------
+# PARTE 4 — COMPARAÇÃO DE ESTOQUE POR ESA
+# ----------------------------
+
+st.markdown("### Comparação de Estoque por ESA (Atual vs Anterior)")
+
+if df_giro_anterior is None:
+    st.warning("Envie o relatório de giro anterior para visualizar a comparação de estoque por ESA.")
+else:
+    df_esa_atual_comp = (
+        df_giro
+        .groupby("ESA Atual", as_index=False)["estoque_total"]
+        .sum()
+        .rename(columns={"estoque_total": "Estoque Atual"})
+    )
+
+    df_esa_anterior_comp = (
+        df_giro_anterior
+        .groupby("ESA Atual", as_index=False)["estoque_total"]
+        .sum()
+        .rename(columns={"estoque_total": "Estoque Anterior"})
+    )
+
+    df_comp_esa = df_esa_atual_comp.merge(
+        df_esa_anterior_comp,
+        on="ESA Atual",
+        how="outer"
+    ).fillna(0)
+
+    def calc_var_esa(row):
+        anterior = row["Estoque Anterior"]
+        atual = row["Estoque Atual"]
+        if anterior == 0:
+            if atual == 0:
+                return 0
+            return np.nan
+        return (atual - anterior) / anterior
+
+    df_comp_esa["Variação"] = df_comp_esa.apply(calc_var_esa, axis=1)
+
+    ordem_esa = [
+        "Sem",
+        "Novo",
+        "Giro",
+        "Abaixo",
+        "Normal",
+        "Aging",
+        "Slow",
+        ">=120d",
+        "Encalhe",
+        "-"
+    ]
+
+    ordem_map = {esa: i for i, esa in enumerate(ordem_esa)}
+    df_comp_esa["ordem"] = df_comp_esa["ESA Atual"].map(ordem_map).fillna(999)
+    df_comp_esa = df_comp_esa.sort_values("ordem").drop(columns="ordem")
+
+    df_comp_esa["Estoque Atual"] = df_comp_esa["Estoque Atual"].apply(fmt_brl_int)
+    df_comp_esa["Estoque Anterior"] = df_comp_esa["Estoque Anterior"].apply(fmt_brl_int)
+    df_comp_esa["Variação"] = df_comp_esa["Variação"].apply(fmt_var)
+
+    st.dataframe(
+        df_comp_esa.rename(columns={"ESA Atual": "ESA"}),
+        use_container_width=True,
+        hide_index=True
+    )
