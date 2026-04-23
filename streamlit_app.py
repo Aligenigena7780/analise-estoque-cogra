@@ -933,15 +933,30 @@ st.markdown("### Comparação de Estoque por ESA (Atual vs Anterior)")
 if df_giro_anterior is None:
     st.warning("Envie o relatório de giro anterior para visualizar a comparação de estoque por ESA.")
 else:
+    opcoes_fabricante = ["Cogra"] + sorted(df_giro["fabricante"].dropna().unique().tolist())
+
+    filtro_comp_esa = st.selectbox(
+        "Visualizar comparação de estoque por ESA para:",
+        options=opcoes_fabricante,
+        key="filtro_comp_esa"
+    )
+
+    if filtro_comp_esa == "Cogra":
+        df_giro_base = df_giro.copy()
+        df_giro_anterior_base = df_giro_anterior.copy()
+    else:
+        df_giro_base = df_giro[df_giro["fabricante"] == filtro_comp_esa].copy()
+        df_giro_anterior_base = df_giro_anterior[df_giro_anterior["fabricante"] == filtro_comp_esa].copy()
+
     df_esa_atual_comp = (
-        df_giro
+        df_giro_base
         .groupby("ESA Atual", as_index=False)["estoque_total"]
         .sum()
         .rename(columns={"estoque_total": "Estoque Atual"})
     )
 
     df_esa_anterior_comp = (
-        df_giro_anterior
+        df_giro_anterior_base
         .groupby("ESA Atual", as_index=False)["estoque_total"]
         .sum()
         .rename(columns={"estoque_total": "Estoque Anterior"})
