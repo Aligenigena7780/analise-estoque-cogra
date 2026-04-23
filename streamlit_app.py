@@ -765,7 +765,10 @@ fig_esa.update_layout(
     xaxis_title="Custo (R$)",
     yaxis_title="Classificação ESA",
     template="plotly_dark",
-    height=400
+    yaxis=dict(
+        categoryorder="array",
+        categoryarray=list(reversed(ORDEM_ESA))
+    )
 )
 
 st.plotly_chart(fig_esa, use_container_width=True, key="grafico_estoque_esa")
@@ -841,6 +844,10 @@ else:
         yaxis_title="Classificação ESA",
         template="plotly_dark",
         height=400
+        yaxis=dict(
+            categoryorder="array",
+            categoryarray=list(reversed(ORDEM_ESA + ["Sem classificação"]))
+        )
     )
 
     st.plotly_chart(fig_fat_esa, use_container_width=True, key="grafico_faturamento_esa")
@@ -925,6 +932,10 @@ else:
                 yaxis_title="Classificação ESA",
                 template="plotly_dark",
                 height=400
+                yaxis=dict(
+                    categoryorder="array",
+                    categoryarray=list(reversed(ORDEM_ESA + ["Sem classificação"]))
+                )
             )
 
             st.plotly_chart(
@@ -963,6 +974,10 @@ else:
                 yaxis_title="Classificação ESA",
                 template="plotly_dark",
                 height=400
+                yaxis=dict(
+                    categoryorder="array",
+                    categoryarray=list(reversed(ORDEM_ESA))
+                )
             )
 
             st.plotly_chart(
