@@ -619,37 +619,7 @@ else:
                 fmt_brl_int(kpi_fab_atual["lucro"]),
                 delta_lucro
             )
-            df_giro["grupo_esa"] = df_giro["ESA Atual"].map(GRUPO_ESA).fillna("Sem classificação")
 
-            estoque_saudavel = df_giro.loc[df_giro["grupo_esa"] == "Saudável", "estoque_total"].sum()
-            estoque_atencao = df_giro.loc[df_giro["grupo_esa"] == "Atenção", "estoque_total"].sum()
-            estoque_critico = df_giro.loc[df_giro["grupo_esa"] == "Crítico", "estoque_total"].sum()
-            
-            pct_saudavel = estoque_saudavel / custo_total_atual if custo_total_atual != 0 else 0
-            pct_atencao = estoque_atencao / custo_total_atual if custo_total_atual != 0 else 0
-            pct_critico = estoque_critico / custo_total_atual if custo_total_atual != 0 else 0
-            
-            st.markdown("### Resumo do Estoque por Grupo de Risco")
-            
-            g1, g2, g3 = st.columns(3)
-            
-            g1.metric(
-                "Estoque Saudável",
-                fmt_brl_int(estoque_saudavel),
-                fmt_pct(pct_saudavel)
-            )
-            
-            g2.metric(
-                "Estoque em Atenção",
-                fmt_brl_int(estoque_atencao),
-                fmt_pct(pct_atencao)
-            )
-            
-            g3.metric(
-                "Estoque Crítico",
-                fmt_brl_int(estoque_critico),
-                fmt_pct(pct_critico)
-            )
             col4.metric(
                 "Margem",
                 fmt_pct(kpi_fab_atual["margem"]),
@@ -778,6 +748,38 @@ col3.metric(
     "Variação do Estoque",
     delta_estoque
 )
+
+            df_giro["grupo_esa"] = df_giro["ESA Atual"].map(GRUPO_ESA).fillna("Sem classificação")
+
+            estoque_saudavel = df_giro.loc[df_giro["grupo_esa"] == "Saudável", "estoque_total"].sum()
+            estoque_atencao = df_giro.loc[df_giro["grupo_esa"] == "Atenção", "estoque_total"].sum()
+            estoque_critico = df_giro.loc[df_giro["grupo_esa"] == "Crítico", "estoque_total"].sum()
+            
+            pct_saudavel = estoque_saudavel / custo_total_atual if custo_total_atual != 0 else 0
+            pct_atencao = estoque_atencao / custo_total_atual if custo_total_atual != 0 else 0
+            pct_critico = estoque_critico / custo_total_atual if custo_total_atual != 0 else 0
+            
+            st.markdown("### Resumo do Estoque por Grupo de Risco")
+            
+            g1, g2, g3 = st.columns(3)
+            
+            g1.metric(
+                "Estoque Saudável",
+                fmt_brl_int(estoque_saudavel),
+                fmt_pct(pct_saudavel)
+            )
+            
+            g2.metric(
+                "Estoque em Atenção",
+                fmt_brl_int(estoque_atencao),
+                fmt_pct(pct_atencao)
+            )
+            
+            g3.metric(
+                "Estoque Crítico",
+                fmt_brl_int(estoque_critico),
+                fmt_pct(pct_critico)
+            )
 
 # ----------------------------
 # PARTE 2 — CUSTO POR ESA
