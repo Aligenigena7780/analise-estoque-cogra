@@ -30,13 +30,13 @@ st.markdown("""
             #E20A13
         );
     
-        background-size: 300% 100%;
+        background-size: 200% auto;
     
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
     
-        animation: rgbFlow 6s linear infinite;
+        animation: redFlow 6s ease-in-out infinite;
     }
     
     @keyframes rgbFlow {
