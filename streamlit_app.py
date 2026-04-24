@@ -539,8 +539,8 @@ fig_dia.update_layout(
     yaxis_title="Faturamento",
     template="plotly_dark",
     height=400,
-    plot_bgcolor="#2E384C",
-    paper_bgcolor="#2E384C"
+    plot_bgcolor="#1a1f2b",
+    paper_bgcolor="#1a1f2b"
 )
 
 st.plotly_chart(fig_dia, use_container_width=True, key="grafico_dia_cogra")
@@ -567,7 +567,9 @@ fig.update_layout(
     xaxis_title="Mês",
     yaxis_title="Faturamento",
     template="plotly_dark",
-    height=400
+    height=400,
+    plot_bgcolor="#1a1f2b",
+    paper_bgcolor="#1a1f2b"
 )
 
 st.plotly_chart(fig, use_container_width=True, key="grafico_6m_cogra")
@@ -687,7 +689,9 @@ else:
                     xaxis_title="Dia",
                     yaxis_title="Faturamento",
                     template="plotly_dark",
-                    height=400
+                    height=400,
+                    plot_bgcolor="#1a1f2b",
+                    paper_bgcolor="#1a1f2b"
                 )
             
                 st.plotly_chart(
@@ -718,7 +722,9 @@ else:
                 xaxis_title="Mês",
                 yaxis_title="Faturamento",
                 template="plotly_dark",
-                height=400
+                height=400,
+                plot_bgcolor="#1a1f2b",
+                paper_bgcolor="#1a1f2b"
             )
             
             st.plotly_chart(
@@ -810,6 +816,8 @@ fig_esa.update_layout(
     xaxis_title="Custo (R$)",
     yaxis_title="Classificação ESA",
     template="plotly_dark",
+    plot_bgcolor="#1a1f2b",
+    paper_bgcolor="#1a1f2b",
     yaxis=dict(
         categoryorder="array",
         categoryarray=list(reversed(ORDEM_ESA))
@@ -889,6 +897,8 @@ else:
         yaxis_title="Classificação ESA",
         template="plotly_dark",
         height=400,
+        plot_bgcolor="#1a1f2b",
+        paper_bgcolor="#1a1f2b",
         yaxis=dict(
             categoryorder="array",
             categoryarray=list(reversed(ORDEM_ESA + ["Sem classificação"]))
@@ -979,6 +989,8 @@ else:
                 yaxis_title="Classificação ESA",
                 template="plotly_dark",
                 height=400,
+                plot_bgcolor="#1a1f2b",
+                paper_bgcolor="#1a1f2b",
                 yaxis=dict(
                     categoryorder="array",
                     categoryarray=list(reversed(ORDEM_ESA + ["Sem classificação"]))
@@ -1021,6 +1033,8 @@ else:
                 yaxis_title="Classificação ESA",
                 template="plotly_dark",
                 height=400,
+                plot_bgcolor="#1a1f2b",
+                paper_bgcolor="#1a1f2b",
                 yaxis=dict(
                     categoryorder="array",
                     categoryarray=list(reversed(ORDEM_ESA))
