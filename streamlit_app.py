@@ -24,7 +24,7 @@ st.markdown("""
     
         background: linear-gradient(
             90deg,
-            #910012,
+            #A80014,
             #E20A13,
             #FF4A1A
         );
