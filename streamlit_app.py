@@ -42,6 +42,29 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+st.markdown("""
+<style>
+.section-divider {
+    height: 2px;
+    background: linear-gradient(to right, transparent, #bbb, transparent);
+    margin: 25px 0;
+}
+
+.section-title {
+    font-size: 32px;
+    font-weight: 700;
+    color: #1f4e79;
+    margin-bottom: 10px;
+}
+
+.section-subtitle {
+    font-size: 16px;
+    color: #666;
+    margin-bottom: 20px;
+}
+</style>
+""", unsafe_allow_html=True)
+
 MESES_PT = {
     1: "Janeiro",
     2: "Fevereiro",
