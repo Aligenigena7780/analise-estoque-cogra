@@ -38,7 +38,7 @@ st.markdown("""
     }
     .section-divider {
         height: 2px;
-        background: linear-gradient(to right, transparent, #444, transparent);
+        background: linear-gradient(to right, transparent, rgba(255,255,255,0.2), transparent);
         margin: 25px 0;
     }
 </style>
