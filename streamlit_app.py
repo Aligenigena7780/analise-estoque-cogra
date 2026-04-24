@@ -19,9 +19,10 @@ st.set_page_config(
 st.markdown("""
 <style>
     .main-title {
-        font-size: 2rem;
-        font-weight: 700;
+        font-size: 60px;
+        font-weight: 900;
         margin-bottom: 0.2rem;
+        color: ##E20A13;
     }
     .sub-title {
         font-size: 0.95rem;
@@ -421,7 +422,7 @@ def ordem_fabricantes(df_mes_atual: pd.DataFrame) -> list[str]:
 # INTERFACE
 # =========================================================
 st.markdown('<div class="main-title">Análise de Produtos</div>', unsafe_allow_html=True)
-st.markdown('<div class="sub-title">Bloco 1 — Análise da Cogra | Bloco 2 — Análise por Fabricante</div>', unsafe_allow_html=True)
+st.markdown('<div class="sub-title">Desenvolvido por Lucas Rodrigues</div>', unsafe_allow_html=True)
 
 with st.sidebar:
     st.header("Arquivos")
