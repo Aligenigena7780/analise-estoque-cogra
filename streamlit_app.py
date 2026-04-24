@@ -539,6 +539,8 @@ fig_dia.update_layout(
     yaxis_title="Faturamento",
     template="plotly_dark",
     height=400
+    plot_bgcolor="#2E384C",
+    paper_bgcolor="#2E384C"
 )
 
 st.plotly_chart(fig_dia, use_container_width=True, key="grafico_dia_cogra")
