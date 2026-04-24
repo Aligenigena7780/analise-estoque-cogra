@@ -53,7 +53,7 @@ st.markdown("""
 .section-title {
     font-size: 32px;
     font-weight: 700;
-    color: #1f4e79;
+    color: #F2F2F2;
     margin-bottom: 10px;
 }
 
