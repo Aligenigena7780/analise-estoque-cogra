@@ -749,6 +749,9 @@ col3.metric(
     delta_estoque
 )
 
+st.write("DEBUG RESUMO ESA")
+st.write(df_giro.columns)
+
 df_giro["grupo_esa"] = df_giro["ESA Atual"].map(GRUPO_ESA).fillna("Sem classificação")
 
 estoque_saudavel = df_giro.loc[df_giro["grupo_esa"] == "Saudável", "estoque_total"].sum()
