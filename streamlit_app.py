@@ -18,22 +18,49 @@ st.set_page_config(
 # =========================================================
 st.markdown("""
 <style>
+st.markdown("""
+<style>
     .main-title {
         font-size: 60px;
         font-weight: 900;
-        margin-bottom: 0.2rem;
     
         background: linear-gradient(
             90deg,
-            #FF3B3B 0%,
-            #E20A13 45%,
-            #910012 0%
+            #ff0000,
+            #ff7300,
+            #fffb00,
+            #48ff00,
+            #00ffd5,
+            #002bff,
+            #7a00ff,
+            #ff00c8,
+            #ff0000
         );
+    
+        background-size: 300% 100%;
     
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
+    
+        animation: rgbFlow 6s linear infinite;
     }
+    
+    @keyframes rgbFlow {
+        0% {
+            background-position: 0% 50%;
+        }
+        100% {
+            background-position: 100% 50%;
+        }
+    }
+    </style>
+    """, unsafe_allow_html=True)
+    
+    st.markdown(
+        '<div class="main-title">Análise de Produtos</div>',
+        unsafe_allow_html=True
+    )
     .sub-title {
         font-size: 0.95rem;
         color: #666;
