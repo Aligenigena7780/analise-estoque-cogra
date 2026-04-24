@@ -749,6 +749,9 @@ col3.metric(
     delta_estoque
 )
 
+# 👉 COLOCA AQUI
+st.write("DEBUG RESUMO ESA")
+st.write(df_giro.columns)
 st.write("DEBUG VALORES GRUPO ESA")
 st.write("Saudável:", estoque_saudavel)
 st.write("Atenção:", estoque_atencao)
