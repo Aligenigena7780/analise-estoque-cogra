@@ -475,7 +475,7 @@ variacoes = {
 # =========================================================
 # BLOCO 1 — ANÁLISE DA COGRA
 # =========================================================
-st.markdown('<div class="section-title">Análise da Cogra</div>', unsafe_allow_html=True)
+
 st.caption(f"Mês analisado: {MESES_PT[mes_atual]}/{ano_atual} | Comparação: {MESES_PT[mes_anterior]}/{ano_anterior}")
 
 c1, c2, c3 = st.columns(3)
