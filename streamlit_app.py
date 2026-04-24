@@ -27,6 +27,7 @@ st.markdown("""
             #E20A13,
             #FF4A1A,
             #910012,
+            #E20A13
         );
     
         background-size: 300% 100%;
