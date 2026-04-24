@@ -36,10 +36,10 @@ st.markdown("""
         -webkit-text-fill-color: transparent;
         background-clip: text;
     
-        animation: rgbFlow 6s linear infinite;
+        animation: Flow 6s linear infinite;
     }
     
-    @keyframes rgbFlow {
+    @keyframes Flow {
         0% {
             background-position: 0% 50%;
         }
