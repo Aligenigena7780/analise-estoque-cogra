@@ -749,13 +749,7 @@ col3.metric(
     delta_estoque
 )
 
-# 👉 COLOCA AQUI
-st.write("DEBUG RESUMO ESA")
-st.write(df_giro.columns)
-st.write("DEBUG VALORES GRUPO ESA")
-st.write("Saudável:", estoque_saudavel)
-st.write("Atenção:", estoque_atencao)
-st.write("Crítico:", estoque_critico)
+st.markdown("### Resumo do Estoque por Grupo de Risco")
 
 df_giro["grupo_esa"] = df_giro["ESA Atual"].map(GRUPO_ESA).fillna("Sem classificação")
 
@@ -763,11 +757,17 @@ estoque_saudavel = df_giro.loc[df_giro["grupo_esa"] == "Saudável", "estoque_tot
 estoque_atencao = df_giro.loc[df_giro["grupo_esa"] == "Atenção", "estoque_total"].sum()
 estoque_critico = df_giro.loc[df_giro["grupo_esa"] == "Crítico", "estoque_total"].sum()
 
-pct_saudavel = estoque_saudavel / custo_total_atual if custo_total_atual != 0 else 0
-pct_atencao = estoque_atencao / custo_total_atual if custo_total_atual != 0 else 0
-pct_critico = estoque_critico / custo_total_atual if custo_total_atual != 0 else 0
+total = custo_total_atual if custo_total_atual != 0 else 1
 
-st.markdown("### Resumo do Estoque por Grupo de Risco")
+pct_saudavel = estoque_saudavel / total
+pct_atencao = estoque_atencao / total
+pct_critico = estoque_critico / total
+
+# DEBUG — agora sim, depois das variáveis criadas
+st.write("DEBUG VALORES GRUPO ESA")
+st.write("Saudável:", estoque_saudavel)
+st.write("Atenção:", estoque_atencao)
+st.write("Crítico:", estoque_critico)
 
 g1, g2, g3 = st.columns(3)
 
