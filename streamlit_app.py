@@ -27,7 +27,7 @@ st.markdown("""
             90deg,
             #FF3B3B 0%,
             #E20A13 45%,
-            #910012 100%
+            #910012 0%
         );
     
         -webkit-background-clip: text;
