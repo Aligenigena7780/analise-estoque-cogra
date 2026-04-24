@@ -538,7 +538,7 @@ fig_dia.update_layout(
     xaxis_title="Dia",
     yaxis_title="Faturamento",
     template="plotly_dark",
-    height=400
+    height=400,
     plot_bgcolor="#2E384C",
     paper_bgcolor="#2E384C"
 )
