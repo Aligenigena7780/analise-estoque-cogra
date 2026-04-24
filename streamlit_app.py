@@ -36,7 +36,7 @@ st.markdown("""
 
     .sub-title {
         font-size: 0.95rem;
-        color: #8c8c8c;
+        color: #FF4A1A;
         margin-bottom: 2rem;
     }
     .section-title {
