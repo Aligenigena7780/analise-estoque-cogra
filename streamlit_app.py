@@ -7,6 +7,14 @@ import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
+st.markdown("""
+<style>
+[data-testid="stAppViewContainer"] {
+    background: linear-gradient(135deg, #4d638f 0%, #1a1f2b 100%);
+}
+</style>
+""", unsafe_allow_html=True)
+
 st.set_page_config(
     page_title="Análise de Produtos",
     page_icon="📊",
