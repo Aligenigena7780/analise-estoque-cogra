@@ -36,17 +36,8 @@ st.markdown("""
         -webkit-text-fill-color: transparent;
         background-clip: text;
     
-        animation: Flow 6s linear infinite;
     }
-    
-    @keyframes Flow {
-        0% {
-            background-position: 0% 50%;
-        }
-        100% {
-            background-position: 100% 50%;
-        }
-    }
+
 
     .sub-title {
         font-size: 0.95rem;
