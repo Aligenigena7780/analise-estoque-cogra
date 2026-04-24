@@ -749,8 +749,10 @@ col3.metric(
     delta_estoque
 )
 
-st.write("DEBUG RESUMO ESA")
-st.write(df_giro.columns)
+st.write("DEBUG VALORES GRUPO ESA")
+st.write("Saudável:", estoque_saudavel)
+st.write("Atenção:", estoque_atencao)
+st.write("Crítico:", estoque_critico)
 
 df_giro["grupo_esa"] = df_giro["ESA Atual"].map(GRUPO_ESA).fillna("Sem classificação")
 
