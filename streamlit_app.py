@@ -36,7 +36,7 @@ st.markdown("""
         -webkit-text-fill-color: transparent;
         background-clip: text;
     
-        animation: redFlow 6s ease-in-out infinite;
+        animation: rgbFlow 6s ease-in-out infinite;
     }
     
     @keyframes rgbFlow {
