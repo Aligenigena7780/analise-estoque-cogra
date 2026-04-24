@@ -763,15 +763,13 @@ pct_saudavel = estoque_saudavel / total
 pct_atencao = estoque_atencao / total
 pct_critico = estoque_critico / total
 
-# DEBUG — agora sim, depois das variáveis criadas
-st.write("DEBUG VALORES GRUPO ESA")
-st.write("Saudável:", estoque_saudavel)
-st.write("Atenção:", estoque_atencao)
-st.write("Crítico:", estoque_critico)
-
 g1, g2, g3 = st.columns(3)
 
-g1.metric("Estoque Saudável", fmt_brl_int(estoque_saudavel), fmt_pct(pct_saudavel))
+g1.metric(
+    "Estoque Saudável",
+    fmt_brl_int(estoque_saudavel),
+    f"{fmt_pct(pct_saudavel)} do total"
+)
 g2.metric("Estoque em Atenção", fmt_brl_int(estoque_atencao), fmt_pct(pct_atencao))
 g3.metric("Estoque Crítico", fmt_brl_int(estoque_critico), fmt_pct(pct_critico))
 
