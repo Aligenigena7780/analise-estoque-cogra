@@ -10,7 +10,7 @@ import streamlit as st
 st.markdown("""
 <style>
 [data-testid="stAppViewContainer"] {
-    background: linear-gradient(135deg, #1a1f2b 0%);
+    background: linear-gradient(135deg, #1a1f2b 100%);
 }
 </style>
 """, unsafe_allow_html=True)
