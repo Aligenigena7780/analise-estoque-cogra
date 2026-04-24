@@ -22,7 +22,11 @@ st.markdown("""
         font-size: 60px;
         font-weight: 900;
         margin-bottom: 0.2rem;
-        color: #E20A13;
+
+        background: linear-gradient(90deg, #E20A13, #910012);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
     }
     .sub-title {
         font-size: 0.95rem;
