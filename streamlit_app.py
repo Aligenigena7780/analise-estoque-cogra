@@ -30,14 +30,14 @@ st.markdown("""
         margin-bottom: 2rem;
     }
     .section-title {
-        font-size: 1.4rem;
+        font-size: 40px;
         font-weight: 700;
         margin-top: 2rem;
         color: #F2F2F2;
         margin-bottom: 1rem;
     }
     .section-divider {
-        height: 2px;
+        height: 4px;
         background: linear-gradient(to right, transparent, #bbb, transparent);
         margin: 25px 0;
     }
