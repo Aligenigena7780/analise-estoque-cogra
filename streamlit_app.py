@@ -39,7 +39,7 @@ st.markdown("""
     .section-divider {
         height: 2px;
         background: linear-gradient(to right, transparent, rgba(255,255,255,0.45), transparent);
-        margin: 25px 0;
+        margin: 21px 0;
     }
 </style>
 """, unsafe_allow_html=True)
