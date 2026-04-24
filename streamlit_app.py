@@ -891,10 +891,12 @@ else:
 # PARTE 3.2 — FATURAMENTO POR ESA POR FABRICANTE
 # ----------------------------
 
-st.markdown("### Faturamento por ESA por Fabricante")
+st.markdown('<div class="section-divider"></div>', unsafe_allow_html=True)
+
+st.markdown("### Faturamento de Fabricante por ESA")
 
 if df_giro_anterior is None:
-    st.warning("Envie o relatório de giro anterior para visualizar o faturamento por ESA por fabricante.")
+    st.warning("Envie o relatório de giro anterior para visualizar o faturamento dos fabricantes por ESA.")
 else:
     fabricantes_fat_esa = (
         df_mes_atual.groupby("fabricante", as_index=False)["vendas_aj"]
