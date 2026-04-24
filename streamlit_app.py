@@ -1025,6 +1025,8 @@ else:
 # PARTE 4 — COMPARAÇÃO DE ESTOQUE POR ESA
 # ----------------------------
 
+st.markdown('<div class="section-divider"></div>', unsafe_allow_html=True)
+
 st.markdown("### Resumo do Estoque por Grupo de Risco")
 
 df_giro["grupo_esa"] = df_giro["ESA Atual"].map(GRUPO_ESA).fillna("Sem classificação")
