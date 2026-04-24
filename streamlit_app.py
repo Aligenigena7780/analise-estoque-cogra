@@ -84,6 +84,23 @@ CORES_ESA = {
     "Sem classificação": "#BDBDBD",
 }
 
+GRUPO_ESA = {
+    "0 - Novo": "Saudável",
+    "4 - Giro": "Saudável",
+    "1 - Abaixo": "Saudável",
+    "2 - Normal": "Saudável",
+
+    "3 - Aging": "Atenção",
+    "5 - Slow": "Atenção",
+
+    "6 - >=120d": "Crítico",
+    "7 - Encalhe": "Crítico",
+
+    "8 - Sem": "Sem classificação",
+    "-": "Sem classificação",
+    "Sem classificação": "Sem classificação",
+}
+
 def ordenar_esa(df: pd.DataFrame, coluna_esa: str = "ESA Atual") -> pd.DataFrame:
     ordem_map = {esa: i for i, esa in enumerate(ORDEM_ESA)}
     df = df.copy()
@@ -601,6 +618,37 @@ else:
                 "Lucro",
                 fmt_brl_int(kpi_fab_atual["lucro"]),
                 delta_lucro
+            )
+            df_giro["grupo_esa"] = df_giro["ESA Atual"].map(GRUPO_ESA).fillna("Sem classificação")
+
+            estoque_saudavel = df_giro.loc[df_giro["grupo_esa"] == "Saudável", "estoque_total"].sum()
+            estoque_atencao = df_giro.loc[df_giro["grupo_esa"] == "Atenção", "estoque_total"].sum()
+            estoque_critico = df_giro.loc[df_giro["grupo_esa"] == "Crítico", "estoque_total"].sum()
+            
+            pct_saudavel = estoque_saudavel / custo_total_atual if custo_total_atual != 0 else 0
+            pct_atencao = estoque_atencao / custo_total_atual if custo_total_atual != 0 else 0
+            pct_critico = estoque_critico / custo_total_atual if custo_total_atual != 0 else 0
+            
+            st.markdown("### Resumo do Estoque por Grupo de Risco")
+            
+            g1, g2, g3 = st.columns(3)
+            
+            g1.metric(
+                "Estoque Saudável",
+                fmt_brl_int(estoque_saudavel),
+                fmt_pct(pct_saudavel)
+            )
+            
+            g2.metric(
+                "Estoque em Atenção",
+                fmt_brl_int(estoque_atencao),
+                fmt_pct(pct_atencao)
+            )
+            
+            g3.metric(
+                "Estoque Crítico",
+                fmt_brl_int(estoque_critico),
+                fmt_pct(pct_critico)
             )
             col4.metric(
                 "Margem",
