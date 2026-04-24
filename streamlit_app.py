@@ -37,9 +37,8 @@ st.markdown("""
         margin-bottom: 1rem;
     }
     .section-divider {
-        height: 4px;
-        background: linear-gradient(to right, transparent, #bbb, transparent);
         margin: 25px 0;
+        border-top: 1px solid rgba(0,0,0,0.1);
     }
 </style>
 """, unsafe_allow_html=True)
