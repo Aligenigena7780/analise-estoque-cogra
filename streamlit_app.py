@@ -1032,6 +1032,30 @@ else:
 # PARTE 4 — COMPARAÇÃO DE ESTOQUE POR ESA
 # ----------------------------
 
+st.markdown("### Resumo do Estoque por Grupo de Risco")
+
+df_giro["grupo_esa"] = df_giro["ESA Atual"].map(GRUPO_ESA).fillna("Sem classificação")
+
+estoque_saudavel = df_giro.loc[df_giro["grupo_esa"] == "Saudável", "estoque_total"].sum()
+estoque_atencao = df_giro.loc[df_giro["grupo_esa"] == "Atenção", "estoque_total"].sum()
+estoque_critico = df_giro.loc[df_giro["grupo_esa"] == "Crítico", "estoque_total"].sum()
+
+total = custo_total_atual if custo_total_atual != 0 else 1
+
+pct_saudavel = estoque_saudavel / total
+pct_atencao = estoque_atencao / total
+pct_critico = estoque_critico / total
+
+g1, g2, g3 = st.columns(3)
+
+g1.metric(
+    "Estoque Saudável",
+    fmt_brl_int(estoque_saudavel),
+    f"{fmt_pct(pct_saudavel)} do total"
+)
+g2.metric("Estoque em Atenção", fmt_brl_int(estoque_atencao), fmt_pct(pct_atencao))
+g3.metric("Estoque Crítico", fmt_brl_int(estoque_critico), fmt_pct(pct_critico))
+
 st.markdown("### Comparação de Estoque por ESA (Atual vs Anterior)")
 
 if df_giro_anterior is None:
