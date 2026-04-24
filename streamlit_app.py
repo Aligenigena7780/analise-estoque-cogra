@@ -38,7 +38,7 @@ st.markdown("""
     }
     .section-divider {
         height: 2px;
-        background: linear-gradient(to right, transparent, rgba(255,255,255,0.2), transparent);
+        background: linear-gradient(to right, transparent, rgba(255,255,255,0.45), transparent);
         margin: 25px 0;
     }
 </style>
@@ -401,6 +401,10 @@ def ordem_fabricantes(df_mes_atual: pd.DataFrame) -> list[str]:
 # =========================================================
 st.markdown('<div class="main-title">Análise de Produtos</div>', unsafe_allow_html=True)
 st.markdown('<div class="sub-title">Desenvolvido por Lucas Rodrigues</div>', unsafe_allow_html=True)
+
+st.markdown('<div class="section-divider"></div>', unsafe_allow_html=True)
+
+st.markdown('<div class="section-title">Análise da Cogra</div>', unsafe_allow_html=True)
 
 with st.sidebar:
     st.header("Arquivos")
