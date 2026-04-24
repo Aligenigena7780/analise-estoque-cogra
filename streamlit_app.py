@@ -33,36 +33,14 @@ st.markdown("""
         font-size: 1.4rem;
         font-weight: 700;
         margin-top: 2rem;
+        color: #F2F2F2;
         margin-bottom: 1rem;
     }
     .section-divider {
-        margin-top: 2rem;
-        margin-bottom: 1rem;
-        border-top: 1px solid #e5e7eb;
+        height: 2px;
+        background: linear-gradient(to right, transparent, #bbb, transparent);
+        margin: 25px 0;
     }
-</style>
-""", unsafe_allow_html=True)
-
-st.markdown("""
-<style>
-.section-divider {
-    height: 2px;
-    background: linear-gradient(to right, transparent, #bbb, transparent);
-    margin: 25px 0;
-}
-
-.section-title {
-    font-size: 40px;
-    font-weight: 700;
-    color: #F2F2F2;
-    margin-bottom: 10px;
-}
-
-.section-subtitle {
-    font-size: 16px;
-    color: #666;
-    margin-bottom: 20px;
-}
 </style>
 """, unsafe_allow_html=True)
 
