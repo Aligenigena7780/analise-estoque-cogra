@@ -52,13 +52,7 @@ st.markdown("""
             background-position: 100% 50%;
         }
     }
-    </style>
-    """, unsafe_allow_html=True)
-    
-    st.markdown(
-        '<div class="main-title">Análise de Produtos</div>',
-        unsafe_allow_html=True
-    )
+
     .sub-title {
         font-size: 0.95rem;
         color: #666;
