@@ -862,13 +862,18 @@ df_merge = df_vendas_esa.merge(
 # tratar não encontrados
 df_merge["ESA Atual"] = df_merge["ESA Atual"].fillna("Sem classificação")
 
-st.markdown("### DEBUG — SKUs que estão como 8 - Sem")
+st.markdown("### DEBUG — Tipos de venda")
 
-df_debug_sem = df_merge[df_merge["ESA Atual"] == "8 - Sem"]
+st.write(df_mes_atual["tipo"].value_counts())
 
-st.write("Qtd SKUs:", df_debug_sem["sku"].nunique())
+st.write("Total sem filtro:", fmt_brl_int(df_mes_atual["vendas_aj"].sum()))
 
-st.dataframe(df_debug_sem[["sku", "vendas_aj"]].head(20))
+st.write(
+    "Total só Tipo N:",
+    fmt_brl_int(
+        df_mes_atual[df_mes_atual["tipo"] == "N"]["vendas_aj"].sum()
+    )
+)
 
 # agrupamento
 df_fat_esa = (
