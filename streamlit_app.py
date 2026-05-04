@@ -862,8 +862,8 @@ df_merge = df_vendas_esa.merge(
 # tratar não encontrados
 df_merge["ESA Atual"] = df_merge["ESA Atual"].fillna("Sem classificação")
 
-st.markdown("### DEBUG — Distribuição ESA antes do agrupamento")
-st.write(df_merge["ESA Atual"].value_counts())
+st.markdown("### DEBUG — Total faturamento usado no gráfico")
+st.write("Total Streamlit:", fmt_brl_int(df_vendas_esa["vendas_aj"].sum()))
 
 # agrupamento
 df_fat_esa = (
