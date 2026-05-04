@@ -832,77 +832,77 @@ st.plotly_chart(fig_esa, use_container_width=True, key="grafico_estoque_esa")
 
 st.markdown("### Faturamento por ESA")
 
-    # base vendas
-    df_vendas_esa = df_mes_atual[["sku", "vendas_aj"]].copy()
-    
-    # base giro atual (ESA)
-    col_sku_giro = "sku" if "sku" in df_giro.columns else None
-    col_esa_giro = "ESA Atual" if "ESA Atual" in df_giro.columns else None
-    
-    if col_sku_giro is None or col_esa_giro is None:
-        st.error(
-            f"Não foi possível montar o faturamento por ESA. "
-            f"Colunas encontradas no giro atual: {list(df_giro.columns)}"
-        )
-        st.stop()
-    
-    df_esa_lookup = df_giro[[col_sku_giro, col_esa_giro]].copy()
-    df_esa_lookup = df_esa_lookup.rename(columns={
-        col_sku_giro: "sku",
-        col_esa_giro: "ESA Atual"
-    })
+# base vendas
+df_vendas_esa = df_mes_atual[["sku", "vendas_aj"]].copy()
 
-    # merge
-    df_merge = df_vendas_esa.merge(
-        df_esa_lookup,
-        on="sku",
-        how="left"
+# base giro atual (ESA)
+col_sku_giro = "sku" if "sku" in df_giro.columns else None
+col_esa_giro = "ESA Atual" if "ESA Atual" in df_giro.columns else None
+
+if col_sku_giro is None or col_esa_giro is None:
+    st.error(
+        f"Não foi possível montar o faturamento por ESA. "
+        f"Colunas encontradas no giro atual: {list(df_giro.columns)}"
     )
+    st.stop()
 
-    # tratar não encontrados
-    df_merge["ESA Atual"] = df_merge["ESA Atual"].fillna("Sem classificação")
+df_esa_lookup = df_giro[[col_sku_giro, col_esa_giro]].copy()
+df_esa_lookup = df_esa_lookup.rename(columns={
+    col_sku_giro: "sku",
+    col_esa_giro: "ESA Atual"
+})
 
-    # agrupamento
-    df_fat_esa = (
-        df_merge
-        .groupby("ESA Atual", as_index=False)["vendas_aj"]
-        .sum()
-        .rename(columns={"vendas_aj": "faturamento_bruto"})
+# merge
+df_merge = df_vendas_esa.merge(
+    df_esa_lookup,
+    on="sku",
+    how="left"
+)
+
+# tratar não encontrados
+df_merge["ESA Atual"] = df_merge["ESA Atual"].fillna("Sem classificação")
+
+# agrupamento
+df_fat_esa = (
+    df_merge
+    .groupby("ESA Atual", as_index=False)["vendas_aj"]
+    .sum()
+    .rename(columns={"vendas_aj": "faturamento_bruto"})
+)
+
+df_fat_esa = df_fat_esa[df_fat_esa["faturamento_bruto"] > 0].copy()
+df_fat_esa = ordenar_esa(df_fat_esa)
+
+# hover formatado
+df_fat_esa["hover_brl"] = df_fat_esa["faturamento_bruto"].apply(fmt_brl_int)
+
+# gráfico
+fig_fat_esa = go.Figure()
+
+fig_fat_esa.add_trace(go.Bar(
+    x=df_fat_esa["faturamento_bruto"],
+    y=df_fat_esa["ESA Atual"],
+    orientation="h",
+    customdata=df_fat_esa["hover_brl"],
+    hovertemplate="%{customdata}<extra></extra>",
+    marker=dict(color=cores_por_esa(df_fat_esa["ESA Atual"]))
+))
+
+fig_fat_esa.update_layout(
+    title="Faturamento por Classificação ESA",
+    xaxis_title="Faturamento (R$)",
+    yaxis_title="Classificação ESA",
+    template="plotly_dark",
+    height=400,
+    plot_bgcolor="#1a1f2b",
+    paper_bgcolor="#1a1f2b",
+    yaxis=dict(
+        categoryorder="array",
+        categoryarray=list(reversed(ORDEM_ESA + ["Sem classificação"]))
     )
+)
 
-    df_fat_esa = df_fat_esa[df_fat_esa["faturamento_bruto"] > 0].copy()
-    df_fat_esa = ordenar_esa(df_fat_esa)
-
-    # hover formatado
-    df_fat_esa["hover_brl"] = df_fat_esa["faturamento_bruto"].apply(fmt_brl_int)
-
-    # gráfico
-    fig_fat_esa = go.Figure()
-
-    fig_fat_esa.add_trace(go.Bar(
-        x=df_fat_esa["faturamento_bruto"],
-        y=df_fat_esa["ESA Atual"],
-        orientation="h",
-        customdata=df_fat_esa["hover_brl"],
-        hovertemplate="%{customdata}<extra></extra>",
-        marker=dict(color=cores_por_esa(df_fat_esa["ESA Atual"]))
-    ))
-
-    fig_fat_esa.update_layout(
-        title="Faturamento por Classificação ESA",
-        xaxis_title="Faturamento (R$)",
-        yaxis_title="Classificação ESA",
-        template="plotly_dark",
-        height=400,
-        plot_bgcolor="#1a1f2b",
-        paper_bgcolor="#1a1f2b",
-        yaxis=dict(
-            categoryorder="array",
-            categoryarray=list(reversed(ORDEM_ESA + ["Sem classificação"]))
-        )
-    )
-
-    st.plotly_chart(fig_fat_esa, use_container_width=True, key="grafico_faturamento_esa")
+st.plotly_chart(fig_fat_esa, use_container_width=True, key="grafico_faturamento_esa")
 
 # ----------------------------
 # PARTE 3.2 — FATURAMENTO POR ESA POR FABRICANTE
