@@ -862,6 +862,15 @@ df_merge = df_vendas_esa.merge(
 # tratar não encontrados
 df_merge["ESA Atual"] = df_merge["ESA Atual"].fillna("Sem classificação")
 
+st.markdown("### DEBUG — SKUs não encontrados no giro")
+
+df_nao_encontrados = df_merge[df_merge["ESA Atual"].isna()]
+
+st.write("Qtd SKUs sem match:", df_nao_encontrados["sku"].nunique())
+st.write("Faturamento sem match:", fmt_brl_int(df_nao_encontrados["vendas_aj"].sum()))
+
+st.dataframe(df_nao_encontrados.head(20))
+
 # agrupamento
 df_fat_esa = (
     df_merge
