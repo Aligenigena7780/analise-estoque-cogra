@@ -832,27 +832,24 @@ st.plotly_chart(fig_esa, use_container_width=True, key="grafico_estoque_esa")
 
 st.markdown("### Faturamento por ESA")
 
-if df_giro_anterior is None:
-    st.warning("Envie o relatório de giro anterior para visualizar o faturamento por ESA.")
-else:
     # base vendas
     df_vendas_esa = df_mes_atual[["sku", "vendas_aj"]].copy()
-
-    # base giro anterior (ESA)
-    col_sku_giro_ant = "sku" if "sku" in df_giro_anterior.columns else None
-    col_esa_giro_ant = "ESA Atual" if "ESA Atual" in df_giro_anterior.columns else None
     
-    if col_sku_giro_ant is None or col_esa_giro_ant is None:
+    # base giro atual (ESA)
+    col_sku_giro = "sku" if "sku" in df_giro.columns else None
+    col_esa_giro = "ESA Atual" if "ESA Atual" in df_giro.columns else None
+    
+    if col_sku_giro is None or col_esa_giro is None:
         st.error(
             f"Não foi possível montar o faturamento por ESA. "
-            f"Colunas encontradas no giro anterior: {list(df_giro_anterior.columns)}"
+            f"Colunas encontradas no giro atual: {list(df_giro.columns)}"
         )
         st.stop()
     
-    df_esa_lookup = df_giro_anterior[[col_sku_giro_ant, col_esa_giro_ant]].copy()
+    df_esa_lookup = df_giro[[col_sku_giro, col_esa_giro]].copy()
     df_esa_lookup = df_esa_lookup.rename(columns={
-        col_sku_giro_ant: "sku",
-        col_esa_giro_ant: "ESA Atual"
+        col_sku_giro: "sku",
+        col_esa_giro: "ESA Atual"
     })
 
     # merge
@@ -941,10 +938,10 @@ else:
             ].copy()
 
             # lookup ESA do giro anterior
-            df_esa_lookup_fab = df_giro_anterior[[col_sku_giro_ant, col_esa_giro_ant]].copy()
+            df_esa_lookup_fab = df_giro[[col_sku_giro, col_esa_giro]].copy()
             df_esa_lookup_fab = df_esa_lookup_fab.rename(columns={
-                col_sku_giro_ant: "sku",
-                col_esa_giro_ant: "ESA Atual"
+                col_sku_giro: "sku",
+                col_esa_giro: "ESA Atual"
             })
 
             # merge
