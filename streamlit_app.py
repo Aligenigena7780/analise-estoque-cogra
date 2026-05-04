@@ -833,7 +833,11 @@ st.plotly_chart(fig_esa, use_container_width=True, key="grafico_estoque_esa")
 st.markdown("### Faturamento por ESA")
 
 # base vendas
-df_vendas_esa = df_mes_atual[["sku", "vendas_aj"]].copy()
+df_vendas_esa = (
+    df_mes_atual
+    .groupby("sku", as_index=False)["vendas_aj"]
+    .sum()
+)
 
 # base giro atual (ESA)
 col_sku_giro = "sku" if "sku" in df_giro.columns else None
@@ -851,6 +855,7 @@ df_esa_lookup = df_esa_lookup.rename(columns={
     col_sku_giro: "sku",
     col_esa_giro: "ESA Atual"
 })
+df_esa_lookup = df_esa_lookup.drop_duplicates(subset="sku")
 
 # merge
 df_merge = df_vendas_esa.merge(
@@ -912,9 +917,6 @@ st.markdown('<div class="section-divider"></div>', unsafe_allow_html=True)
 
 st.markdown("### Faturamento de Fabricante por ESA")
 
-if df_giro_anterior is None:
-    st.warning("Envie o relatório de giro anterior para visualizar o faturamento dos fabricantes por ESA.")
-else:
     fabricantes_fat_esa = (
         df_mes_atual.groupby("fabricante", as_index=False)["vendas_aj"]
         .sum()
@@ -932,10 +934,14 @@ else:
 
         with st.expander(expander_label, expanded=False):
             # vendas da fabricante no mês
-            df_vendas_fab = df_mes_atual.loc[
+        df_vendas_fab = (
+            df_mes_atual.loc[
                 df_mes_atual["fabricante"] == fabricante,
                 ["sku", "vendas_aj"]
-            ].copy()
+            ]
+            .groupby("sku", as_index=False)["vendas_aj"]
+            .sum()
+        )
 
             # lookup ESA do giro anterior
             df_esa_lookup_fab = df_giro[[col_sku_giro, col_esa_giro]].copy()
@@ -943,6 +949,7 @@ else:
                 col_sku_giro: "sku",
                 col_esa_giro: "ESA Atual"
             })
+            df_esa_lookup_fab = df_esa_lookup.copy()
 
             # merge
             df_merge_fab = df_vendas_fab.merge(
