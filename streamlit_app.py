@@ -862,15 +862,13 @@ df_merge = df_vendas_esa.merge(
 # tratar não encontrados
 df_merge["ESA Atual"] = df_merge["ESA Atual"].fillna("Sem classificação")
 
-st.markdown("### DEBUG — Total faturamento usado no gráfico")
-st.write("Total Streamlit:", fmt_brl_int(df_vendas_esa["vendas_aj"].sum()))
-
-st.markdown("### DEBUG — Faturamento só do ESA 8 - Sem")
+st.markdown("### DEBUG — SKUs que estão como 8 - Sem")
 
 df_debug_sem = df_merge[df_merge["ESA Atual"] == "8 - Sem"]
 
-st.write("Total 8-Sem Streamlit:", fmt_brl_int(df_debug_sem["vendas_aj"].sum()))
-st.dataframe(df_debug_sem.head(20))
+st.write("Qtd SKUs:", df_debug_sem["sku"].nunique())
+
+st.dataframe(df_debug_sem[["sku", "vendas_aj"]].head(20))
 
 # agrupamento
 df_fat_esa = (
