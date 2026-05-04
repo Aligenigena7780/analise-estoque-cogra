@@ -949,6 +949,31 @@ for _, row in fabricantes_fat_esa.iterrows():
             how="left"
         )
 
+        df_merge_fab = df_vendas_fab.merge(
+            df_esa_lookup_fab,
+            on="sku",
+            how="left"
+        )
+        
+        # 🔥 DEBUG AQUI
+        if fabricante == "EPSON":
+            st.write("DEBUG EPSON 8 - SEM")
+        
+            st.write(
+                fmt_brl_int(
+                    df_merge_fab.loc[
+                        df_merge_fab["ESA Atual"] == "8 - Sem",
+                        "vendas_aj"
+                    ].sum()
+                )
+            )
+        
+            st.dataframe(
+                df_merge_fab[
+                    df_merge_fab["ESA Atual"] == "8 - Sem"
+                ].sort_values("vendas_aj", ascending=False)
+            )
+
         # tratar não encontrados
         df_merge_fab["ESA Atual"] = df_merge_fab["ESA Atual"].fillna("Sem classificação")
 
