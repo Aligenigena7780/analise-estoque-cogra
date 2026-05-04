@@ -831,9 +831,6 @@ st.plotly_chart(fig_esa, use_container_width=True, key="grafico_estoque_esa")
 # ----------------------------
 
 st.markdown("### Faturamento por ESA")
-
-    # base vendas
-    df_vendas_esa = df_mes_atual[["sku", "vendas_aj"]].copy()
     
     # base giro atual (ESA)
     col_sku_giro = "sku" if "sku" in df_giro.columns else None
