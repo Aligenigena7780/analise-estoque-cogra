@@ -914,26 +914,24 @@ st.plotly_chart(fig_fat_esa, use_container_width=True, key="grafico_faturamento_
 # ----------------------------
 
 st.markdown('<div class="section-divider"></div>', unsafe_allow_html=True)
-
 st.markdown("### Faturamento de Fabricante por ESA")
 
-    fabricantes_fat_esa = (
-        df_mes_atual.groupby("fabricante", as_index=False)["vendas_aj"]
-        .sum()
-        .sort_values("vendas_aj", ascending=False)
+fabricantes_fat_esa = (
+    df_mes_atual.groupby("fabricante", as_index=False)["vendas_aj"]
+    .sum()
+    .sort_values("vendas_aj", ascending=False)
+)
+
+for _, row in fabricantes_fat_esa.iterrows():
+    fabricante = row["fabricante"]
+    faturamento_total_fab = row["vendas_aj"]
+
+    expander_label = (
+        f"{fabricante} | "
+        f"Faturamento Bruto: {fmt_brl_int_label(faturamento_total_fab)}"
     )
 
-    for _, row in fabricantes_fat_esa.iterrows():
-        fabricante = row["fabricante"]
-        faturamento_total_fab = row["vendas_aj"]
-
-        expander_label = (
-            f"{fabricante} | "
-            f"Faturamento Bruto: {fmt_brl_int_label(faturamento_total_fab)}"
-        )
-
-        with st.expander(expander_label, expanded=False):
-            # vendas da fabricante no mês
+    with st.expander(expander_label, expanded=False):
         df_vendas_fab = (
             df_mes_atual.loc[
                 df_mes_atual["fabricante"] == fabricante,
@@ -943,20 +941,13 @@ st.markdown("### Faturamento de Fabricante por ESA")
             .sum()
         )
 
-            # lookup ESA do giro anterior
-            df_esa_lookup_fab = df_giro[[col_sku_giro, col_esa_giro]].copy()
-            df_esa_lookup_fab = df_esa_lookup_fab.rename(columns={
-                col_sku_giro: "sku",
-                col_esa_giro: "ESA Atual"
-            })
-            df_esa_lookup_fab = df_esa_lookup.copy()
+        df_esa_lookup_fab = df_esa_lookup.copy()
 
-            # merge
-            df_merge_fab = df_vendas_fab.merge(
-                df_esa_lookup_fab,
-                on="sku",
-                how="left"
-            )
+        df_merge_fab = df_vendas_fab.merge(
+            df_esa_lookup_fab,
+            on="sku",
+            how="left"
+        )
 
             # tratar não encontrados
             df_merge_fab["ESA Atual"] = df_merge_fab["ESA Atual"].fillna("Sem classificação")
