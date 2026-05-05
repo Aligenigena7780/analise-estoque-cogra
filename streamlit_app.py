@@ -250,6 +250,7 @@ def carregar_vendas(arquivo_bytes: bytes) -> pd.DataFrame:
     df["lucro"] = parse_numeric(df["lucro"]).fillna(0)
     df["tipo"] = df["tipo"].astype(str).str.strip().str.upper()
     df["fabricante"] = df["fabricante"].astype(str).str.strip()
+    df["sku"] = df["sku"].astype(str)
 
     # No seu relatório, devoluções já vêm negativas.
     df["vendas_aj"] = df["vendas"]
@@ -282,9 +283,10 @@ def carregar_giro(arquivo_bytes: bytes) -> pd.DataFrame:
     df = df.rename(columns=rename_map)
     df["estoque_total"] = parse_numeric(df["estoque_total"]).fillna(0)
     df["fabricante"] = df["fabricante"].astype(str).str.strip()
+    df["sku"] = df["sku"].astype(str)
 
     if "sku" in df.columns:
-        df["sku"] = df["sku"].astype(str).str.strip()
+        df["sku"] = df["sku"].astype(str)
 
     return df
 
