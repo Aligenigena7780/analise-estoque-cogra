@@ -833,11 +833,7 @@ st.plotly_chart(fig_esa, use_container_width=True, key="grafico_estoque_esa")
 st.markdown("### Faturamento por ESA")
 
 # base vendas
-df_vendas_esa = (
-    df_mes_atual
-    .groupby("sku", as_index=False)["vendas_aj"]
-    .sum()
-)
+df_vendas_esa = df_mes_atual[["sku", "vendas_aj"]].copy()
 
 # base giro atual (ESA)
 col_sku_giro = "sku" if "sku" in df_giro.columns else None
@@ -855,7 +851,6 @@ df_esa_lookup = df_esa_lookup.rename(columns={
     col_sku_giro: "sku",
     col_esa_giro: "ESA Atual"
 })
-df_esa_lookup = df_esa_lookup.drop_duplicates(subset="sku")
 
 # merge
 df_merge = df_vendas_esa.merge(
@@ -914,158 +909,140 @@ st.plotly_chart(fig_fat_esa, use_container_width=True, key="grafico_faturamento_
 # ----------------------------
 
 st.markdown('<div class="section-divider"></div>', unsafe_allow_html=True)
+
 st.markdown("### Faturamento de Fabricante por ESA")
 
-fabricantes_fat_esa = (
-    df_mes_atual.groupby("fabricante", as_index=False)["vendas_aj"]
-    .sum()
-    .sort_values("vendas_aj", ascending=False)
-)
-
-for _, row in fabricantes_fat_esa.iterrows():
-    fabricante = row["fabricante"]
-    faturamento_total_fab = row["vendas_aj"]
-
-    expander_label = (
-        f"{fabricante} | "
-        f"Faturamento Bruto: {fmt_brl_int_label(faturamento_total_fab)}"
+if df_giro_anterior is None:
+    st.warning("Envie o relatório de giro anterior para visualizar o faturamento dos fabricantes por ESA.")
+else:
+    fabricantes_fat_esa = (
+        df_mes_atual.groupby("fabricante", as_index=False)["vendas_aj"]
+        .sum()
+        .sort_values("vendas_aj", ascending=False)
     )
 
-    with st.expander(expander_label, expanded=False):
-        df_vendas_fab = (
-            df_mes_atual.loc[
+    for _, row in fabricantes_fat_esa.iterrows():
+        fabricante = row["fabricante"]
+        faturamento_total_fab = row["vendas_aj"]
+
+        expander_label = (
+            f"{fabricante} | "
+            f"Faturamento Bruto: {fmt_brl_int_label(faturamento_total_fab)}"
+        )
+
+        with st.expander(expander_label, expanded=False):
+            # vendas da fabricante no mês
+            df_vendas_fab = df_mes_atual.loc[
                 df_mes_atual["fabricante"] == fabricante,
                 ["sku", "vendas_aj"]
-            ]
-            .groupby("sku", as_index=False)["vendas_aj"]
-            .sum()
-        )
+            ].copy()
 
-        df_esa_lookup_fab = df_esa_lookup.copy()
+            # lookup ESA do giro anterior
+            df_esa_lookup_fab = df_giro[[col_sku_giro, col_esa_giro]].copy()
+            df_esa_lookup_fab = df_esa_lookup_fab.rename(columns={
+                col_sku_giro: "sku",
+                col_esa_giro: "ESA Atual"
+            })
 
-        df_merge_fab = df_vendas_fab.merge(
-            df_esa_lookup_fab,
-            on="sku",
-            how="left"
-        )
+            # merge
+            df_merge_fab = df_vendas_fab.merge(
+                df_esa_lookup_fab,
+                on="sku",
+                how="left"
+            )
 
-        df_merge_fab = df_vendas_fab.merge(
-            df_esa_lookup_fab,
-            on="sku",
-            how="left"
-        )
-        
-        # 🔥 DEBUG AQUI
-        if fabricante == "EPSON":
-            st.write("DEBUG EPSON 8 - SEM")
-        
-            st.write(
-                fmt_brl_int(
-                    df_merge_fab.loc[
-                        df_merge_fab["ESA Atual"] == "8 - Sem",
-                        "vendas_aj"
-                    ].sum()
+            # tratar não encontrados
+            df_merge_fab["ESA Atual"] = df_merge_fab["ESA Atual"].fillna("Sem classificação")
+
+            # agrupamento
+            df_fat_esa_fab = (
+                df_merge_fab
+                .groupby("ESA Atual", as_index=False)["vendas_aj"]
+                .sum()
+                .rename(columns={"vendas_aj": "faturamento_bruto"})
+            )
+
+            df_fat_esa_fab = df_fat_esa_fab[df_fat_esa_fab["faturamento_bruto"] > 0].copy()
+            df_fat_esa_fab = ordenar_esa(df_fat_esa_fab)
+
+            # hover formatado
+            df_fat_esa_fab["hover_brl"] = df_fat_esa_fab["faturamento_bruto"].apply(fmt_brl_int)
+
+            # gráfico
+            fig_fat_esa_fab = go.Figure()
+
+            fig_fat_esa_fab.add_trace(go.Bar(
+                x=df_fat_esa_fab["faturamento_bruto"],
+                y=df_fat_esa_fab["ESA Atual"],
+                orientation="h",
+                customdata=df_fat_esa_fab["hover_brl"],
+                hovertemplate="%{customdata}<extra></extra>",
+                marker=dict(color=cores_por_esa(df_fat_esa_fab["ESA Atual"]))
+            ))
+
+            fig_fat_esa_fab.update_layout(
+                title=f"Faturamento por ESA — {fabricante}",
+                xaxis_title="Faturamento (R$)",
+                yaxis_title="Classificação ESA",
+                template="plotly_dark",
+                height=400,
+                plot_bgcolor="#1a1f2b",
+                paper_bgcolor="#1a1f2b",
+                yaxis=dict(
+                    categoryorder="array",
+                    categoryarray=list(reversed(ORDEM_ESA + ["Sem classificação"]))
                 )
             )
-        
-            st.dataframe(
-                df_merge_fab[
-                    df_merge_fab["ESA Atual"] == "8 - Sem"
-                ].sort_values("vendas_aj", ascending=False)
+
+            st.plotly_chart(
+                fig_fat_esa_fab,
+                use_container_width=True,
+                key=f"grafico_faturamento_esa_fabricante_{fabricante}"
             )
 
-        # tratar não encontrados
-        df_merge_fab["ESA Atual"] = df_merge_fab["ESA Atual"].fillna("Sem classificação")
+            st.markdown("#### Estoque por ESA")
 
-        # agrupamento
-        df_fat_esa_fab = (
-            df_merge_fab
-            .groupby("ESA Atual", as_index=False)["vendas_aj"]
-            .sum()
-            .rename(columns={"vendas_aj": "faturamento_bruto"})
-        )
-
-        df_fat_esa_fab = df_fat_esa_fab[df_fat_esa_fab["faturamento_bruto"] > 0].copy()
-        df_fat_esa_fab = ordenar_esa(df_fat_esa_fab)
-
-        # hover formatado
-        df_fat_esa_fab["hover_brl"] = df_fat_esa_fab["faturamento_bruto"].apply(fmt_brl_int)
-
-        # gráfico
-        fig_fat_esa_fab = go.Figure()
-
-        fig_fat_esa_fab.add_trace(go.Bar(
-            x=df_fat_esa_fab["faturamento_bruto"],
-            y=df_fat_esa_fab["ESA Atual"],
-            orientation="h",
-            customdata=df_fat_esa_fab["hover_brl"],
-            hovertemplate="%{customdata}<extra></extra>",
-            marker=dict(color=cores_por_esa(df_fat_esa_fab["ESA Atual"]))
-        ))
-
-        fig_fat_esa_fab.update_layout(
-            title=f"Faturamento por ESA — {fabricante}",
-            xaxis_title="Faturamento (R$)",
-            yaxis_title="Classificação ESA",
-            template="plotly_dark",
-            height=400,
-            plot_bgcolor="#1a1f2b",
-            paper_bgcolor="#1a1f2b",
-            yaxis=dict(
-                categoryorder="array",
-                categoryarray=list(reversed(ORDEM_ESA + ["Sem classificação"]))
+            df_estoque_esa_fab = (
+                df_giro[df_giro["fabricante"] == fabricante]
+                .groupby("ESA Atual", as_index=False)["estoque_total"]
+                .sum()
             )
-        )
 
-        st.plotly_chart(
-            fig_fat_esa_fab,
-            use_container_width=True,
-            key=f"grafico_faturamento_esa_fabricante_{fabricante}"
-        )
+            df_estoque_esa_fab = df_estoque_esa_fab[df_estoque_esa_fab["estoque_total"] > 0].copy()
+            df_estoque_esa_fab = ordenar_esa(df_estoque_esa_fab)
 
-        st.markdown("#### Estoque por ESA")
+            df_estoque_esa_fab["hover_brl"] = df_estoque_esa_fab["estoque_total"].apply(fmt_brl_int)
+            
+            fig_estoque_esa_fab = go.Figure()
 
-        df_estoque_esa_fab = (
-            df_giro[df_giro["fabricante"] == fabricante]
-            .groupby("ESA Atual", as_index=False)["estoque_total"]
-            .sum()
-        )
+            fig_estoque_esa_fab.add_trace(go.Bar(
+                x=df_estoque_esa_fab["estoque_total"],
+                y=df_estoque_esa_fab["ESA Atual"],
+                orientation="h",
+                customdata=df_estoque_esa_fab["hover_brl"],
+                hovertemplate="%{customdata}<extra></extra>",
+                marker=dict(color=cores_por_esa(df_estoque_esa_fab["ESA Atual"]))
+            ))
 
-        df_estoque_esa_fab = df_estoque_esa_fab[df_estoque_esa_fab["estoque_total"] > 0].copy()
-        df_estoque_esa_fab = ordenar_esa(df_estoque_esa_fab)
-
-        df_estoque_esa_fab["hover_brl"] = df_estoque_esa_fab["estoque_total"].apply(fmt_brl_int)
-        
-        fig_estoque_esa_fab = go.Figure()
-
-        fig_estoque_esa_fab.add_trace(go.Bar(
-            x=df_estoque_esa_fab["estoque_total"],
-            y=df_estoque_esa_fab["ESA Atual"],
-            orientation="h",
-            customdata=df_estoque_esa_fab["hover_brl"],
-            hovertemplate="%{customdata}<extra></extra>",
-            marker=dict(color=cores_por_esa(df_estoque_esa_fab["ESA Atual"]))
-        ))
-
-        fig_estoque_esa_fab.update_layout(
-            title=f"Estoque por ESA — {fabricante}",
-            xaxis_title="Estoque (R$)",
-            yaxis_title="Classificação ESA",
-            template="plotly_dark",
-            height=400,
-            plot_bgcolor="#1a1f2b",
-            paper_bgcolor="#1a1f2b",
-            yaxis=dict(
-                categoryorder="array",
-                categoryarray=list(reversed(ORDEM_ESA))
+            fig_estoque_esa_fab.update_layout(
+                title=f"Estoque por ESA — {fabricante}",
+                xaxis_title="Estoque (R$)",
+                yaxis_title="Classificação ESA",
+                template="plotly_dark",
+                height=400,
+                plot_bgcolor="#1a1f2b",
+                paper_bgcolor="#1a1f2b",
+                yaxis=dict(
+                    categoryorder="array",
+                    categoryarray=list(reversed(ORDEM_ESA))
+                )
             )
-        )
 
-        st.plotly_chart(
-            fig_estoque_esa_fab,
-            use_container_width=True,
-            key=f"grafico_estoque_esa_fabricante_{fabricante}"
-        )
+            st.plotly_chart(
+                fig_estoque_esa_fab,
+                use_container_width=True,
+                key=f"grafico_estoque_esa_fabricante_{fabricante}"
+            )
 
 # ----------------------------
 # PARTE 4 — COMPARAÇÃO DE ESTOQUE POR ESA
